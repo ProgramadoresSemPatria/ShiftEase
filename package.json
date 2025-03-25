@@ -1,11 +1,16 @@
 {
   "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.5.0",
     "turbo": "^2.4.4"
   },
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "start": "node apps/api/dist/main"
+    "start": "node apps/api/dist/main",
+    "prepare": "husky install"
   },
   "packageManager": "yarn@1.22.22",
   "private": true,
