@@ -7,48 +7,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  FUNCIONARIO
-  GESTOR
+enum Role {
+  USER
+  MANAGER
   ADMIN
 
-  @@map("user_roles")
+  @@map("roles")
 }
 
 enum ShiftExchangeStatus {
-  PENDENTE
-  APROVADO_RECEPTOR
-  APROVADO_GESTOR
-  REJEITADO
+  PENDING
+  APPROVED_RECEIVER
+  APPROVED_MANAGER
+  REJECTED
 
   @@map("shift_exchange_status")
 }
 
 enum WeekDay {
-  SEGUNDA
-  TERCA
-  QUARTA
-  QUINTA
-  SEXTA
-  SABADO
-  DOMINGO
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 
   @@map("week_days")
 }
 
 enum ShiftType {
-  DIURNO
-  NOTURNO
+  DIURNAL
+  NOCTURNAL
 
   @@map("shift_types")
-}
-
-model Role {
-  id    String   @id @default(uuid()) @db.Uuid
-  name  UserRole @unique
-  users User[]
-
-  @@map("roles")
 }
 
 model User {
@@ -57,10 +49,9 @@ model User {
   email         String @unique
   password      String
   department_id String @db.Uuid
-  role_id       String @db.Uuid
+  role          Role   @default(USER)
 
   department Department @relation(fields: [department_id], references: [id], onDelete: Cascade)
-  role       Role       @relation(fields: [role_id], references: [id], onDelete: Cascade)
 
   schedules         Schedule[]
   requests_sent     ShiftExchangeRequest[] @relation("requests_sent")
@@ -126,7 +117,7 @@ model ShiftExchangeRequest {
   applicant_id    String              @db.Uuid
   receptor_id     String              @db.Uuid
   department_id   String              @db.Uuid
-  status          ShiftExchangeStatus @default(PENDENTE)
+  status          ShiftExchangeStatus @default(PENDING)
   origin_shift_id String              @db.Uuid
   destination_id  String              @db.Uuid
   start_date      DateTime            @default(now())
