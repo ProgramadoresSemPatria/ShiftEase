@@ -45,7 +45,7 @@ enum ShiftType {
 
 model Role {
   id    String   @id @default(uuid()) @db.Uuid
-  name  UserRole
+  name  UserRole @unique
   users User[]
 
   @@map("roles")
@@ -59,8 +59,8 @@ model User {
   department_id String @db.Uuid
   role_id       String @db.Uuid
 
-  department Department @relation(fields: [department_id], references: [id])
-  role       Role       @relation(fields: [role_id], references: [id])
+  department Department @relation(fields: [department_id], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [role_id], references: [id], onDelete: Cascade)
 
   schedules         Schedule[]
   requests_sent     ShiftExchangeRequest[] @relation("requests_sent")
@@ -102,7 +102,7 @@ model Schedule {
   start_date DateTime
   end_date   DateTime
 
-  user            User            @relation(fields: [user_id], references: [id])
+  user            User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
   schedule_shifts ScheduleShift[]
 
   @@map("schedules")
