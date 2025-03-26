@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
+
 export const HeroSection = () => {
 	return (
 		<div className="flex flex-col md:flex-row justify-center items-center gap-2 px-4 md:px-40 py-5 md:py-10 bg-gradient-to-r from-neutral-900 to-orange-800 text-center md:text-start">
