@@ -5,6 +5,7 @@ import {
   UserRole,
   WeekDay,
 } from '@prisma/client'
+import { hash } from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -12,6 +13,10 @@ const prisma = new PrismaClient()
 //!! assim auxiliar no desenvolvimento das telas e funcionalidades
 
 async function main() {
+  function hashPassword(password) {
+    return hash(password, 12)
+  }
+
   await prisma.role.createMany({
     data: [
       { name: UserRole.ADMIN },
@@ -68,7 +73,7 @@ async function main() {
     data: {
       name: 'Admin de TI',
       email: 'admin.ti@hospital.com',
-      password: 'senhaHasheada123',
+      password: await hashPassword('admin.ti@hospital.com'),
       department_id: tiDepartment.id,
       role_id: adminRole.id,
     },
@@ -78,7 +83,7 @@ async function main() {
     data: {
       name: 'Gestor UTI Diurno',
       email: 'gestor.uti.diurno@hospital.com',
-      password: 'senhaHasheadaUTI1',
+      password: await hashPassword('gestor.uti.diurno@hospital.com'),
       department_id: utiDepartment.id,
       role_id: gestorRole.id,
     },
@@ -88,7 +93,7 @@ async function main() {
     data: {
       name: 'Gestor UTI Noturno',
       email: 'gestor.uti.noturno@hospital.com',
-      password: 'senhaHasheadaUTI2',
+      password: await hashPassword('gestor.uti.noturno@hospital.com'),
       department_id: utiDepartment.id,
       role_id: gestorRole.id,
     },
@@ -99,7 +104,7 @@ async function main() {
       data: {
         name: 'Enfermeiro UTI 1',
         email: 'enfermeiro1.uti@hospital.com',
-        password: 'senhaHasheadaUTI3',
+        password: await hashPassword('enfermeiro1.uti@hospital.com'),
         department_id: utiDepartment.id,
         role_id: funcionarioRole.id,
       },
@@ -108,7 +113,7 @@ async function main() {
       data: {
         name: 'Enfermeiro UTI 2',
         email: 'enfermeiro2.uti@hospital.com',
-        password: 'senhaHasheadaUTI4',
+        password: await hashPassword('enfermeiro2.uti@hospital.com'),
         department_id: utiDepartment.id,
         role_id: funcionarioRole.id,
       },
@@ -117,7 +122,7 @@ async function main() {
       data: {
         name: 'Enfermeiro UTI 3',
         email: 'enfermeiro3.uti@hospital.com',
-        password: 'senhaHasheadaUTI5',
+        password: await hashPassword('enfermeiro3.uti@hospital.com'),
         department_id: utiDepartment.id,
         role_id: funcionarioRole.id,
       },
@@ -126,7 +131,7 @@ async function main() {
       data: {
         name: 'Enfermeiro UTI 4',
         email: 'enfermeiro4.uti@hospital.com',
-        password: 'senhaHasheadaUTI6',
+        password: await hashPassword('enfermeiro4.uti@hospital.com'),
         department_id: utiDepartment.id,
         role_id: funcionarioRole.id,
       },
@@ -135,7 +140,7 @@ async function main() {
       data: {
         name: 'Enfermeiro UTI 5',
         email: 'enfermeiro5.uti@hospital.com',
-        password: 'senhaHasheadaUTI7',
+        password: await hashPassword('enfermeiro5.uti@hospital.com'),
         department_id: utiDepartment.id,
         role_id: funcionarioRole.id,
       },
@@ -144,7 +149,7 @@ async function main() {
       data: {
         name: 'Enfermeiro UTI 6',
         email: 'enfermeiro6.uti@hospital.com',
-        password: 'senhaHasheadaUTI8',
+        password: await hashPassword('enfermeiro6.uti@hospital.com'),
         department_id: utiDepartment.id,
         role_id: funcionarioRole.id,
       },
