@@ -8,7 +8,7 @@ export const FeatureSection = () => {
 	return (
 		<div className="flex flex-col items-center gap-5 px-4 md:px-40 py-5 md:py-10 bg-neutral-950 ">
 			<h2 className="font-bold text-2xl">Why Shiftease?</h2>
-			<div className="flex  flex-col md:flex-row gap-3">
+			<div className="grid grid-cols-1 md:grid-cols-4 gap-3">
 				<FeatureCard
 					icon={<ClockIcon size={35} />}
 					title="Shift Visualization"
