@@ -7,11 +7,137 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  FUNCIONARIO
+  GESTOR
+  ADMIN
+
+  @@map("user_roles")
+}
+
+enum ShiftExchangeStatus {
+  PENDENTE
+  APROVADO_RECEPTOR
+  APROVADO_GESTOR
+  REJEITADO
+
+  @@map("shift_exchange_status")
+}
+
+enum WeekDay {
+  SEGUNDA
+  TERCA
+  QUARTA
+  QUINTA
+  SEXTA
+  SABADO
+  DOMINGO
+
+  @@map("week_days")
+}
+
+enum ShiftType {
+  DIURNO
+  NOTURNO
+
+  @@map("shift_types")
+}
+
+model Role {
+  id    String   @id @default(uuid()) @db.Uuid
+  name  UserRole
+  users User[]
+
+  @@map("roles")
+}
+
 model User {
-  id       String @id @default(uuid()) @db.Uuid
-  name     String
-  password String
-  email    String @unique
+  id            String @id @default(uuid()) @db.Uuid
+  name          String
+  email         String @unique
+  password      String
+  department_id String @db.Uuid
+  role_id       String @db.Uuid
+
+  department Department @relation(fields: [department_id], references: [id])
+  role       Role       @relation(fields: [role_id], references: [id])
+
+  schedules         Schedule[]
+  requests_sent     ShiftExchangeRequest[] @relation("requests_sent")
+  requests_received ShiftExchangeRequest[] @relation("requests_received")
 
   @@map("users")
+}
+
+model Department {
+  id     String @id @default(uuid()) @db.Uuid
+  name   String
+  codigo String @unique
+
+  users                   User[]
+  shifts                  Shift[]
+  shift_exchange_requests ShiftExchangeRequest[]
+
+  @@map("departments")
+}
+
+model Shift {
+  id            String    @id @default(uuid()) @db.Uuid
+  department_id String    @db.Uuid
+  tipo          ShiftType
+
+  department Department @relation(fields: [department_id], references: [id])
+
+  schedule_shifts    ScheduleShift[]
+  origin_shifts      ShiftExchangeRequest[] @relation("origin_shift")
+  destination_shifts ShiftExchangeRequest[] @relation("destination_shift")
+
+  @@map("shifts")
+}
+
+model Schedule {
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String   @db.Uuid
+  name       String
+  start_date DateTime
+  end_date   DateTime
+
+  user            User            @relation(fields: [user_id], references: [id])
+  schedule_shifts ScheduleShift[]
+
+  @@map("schedules")
+}
+
+model ScheduleShift {
+  id          String   @id @default(uuid()) @db.Uuid
+  schedule_id String   @db.Uuid
+  shift_id    String   @db.Uuid
+  dia_semana  WeekDay
+  data        DateTime
+
+  schedule Schedule @relation(fields: [schedule_id], references: [id])
+  shift    Shift    @relation(fields: [shift_id], references: [id])
+
+  @@map("schedule_shifts")
+}
+
+model ShiftExchangeRequest {
+  id              String              @id @default(uuid()) @db.Uuid
+  applicant_id    String              @db.Uuid
+  receptor_id     String              @db.Uuid
+  department_id   String              @db.Uuid
+  status          ShiftExchangeStatus @default(PENDENTE)
+  origin_shift_id String              @db.Uuid
+  destination_id  String              @db.Uuid
+  start_date      DateTime            @default(now())
+  end_date        DateTime?
+  motivo          String?
+
+  applicant         User       @relation("requests_sent", fields: [applicant_id], references: [id])
+  receptor          User       @relation("requests_received", fields: [receptor_id], references: [id])
+  department        Department @relation(fields: [department_id], references: [id])
+  origin_shift      Shift      @relation("origin_shift", fields: [origin_shift_id], references: [id])
+  destination_shift Shift      @relation("destination_shift", fields: [destination_id], references: [id])
+
+  @@map("shift_exchange_requests")
 }
