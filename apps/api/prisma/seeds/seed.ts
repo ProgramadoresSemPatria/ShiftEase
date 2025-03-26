@@ -1,8 +1,8 @@
 import {
   PrismaClient,
+  Role,
   ShiftExchangeStatus,
   ShiftType,
-  UserRole,
   WeekDay,
 } from '@prisma/client'
 import { hash } from 'bcryptjs'
@@ -17,15 +17,6 @@ async function main() {
     return hash(password, 12)
   }
 
-  await prisma.role.createMany({
-    data: [
-      { name: UserRole.ADMIN },
-      { name: UserRole.GESTOR },
-      { name: UserRole.FUNCIONARIO },
-    ],
-    skipDuplicates: true,
-  })
-
   await prisma.department.createMany({
     data: [
       {
@@ -37,36 +28,18 @@ async function main() {
         codigo: 'UTI-001',
       },
     ],
+    skipDuplicates: true,
   })
 
   const tiDepartment = await prisma.department.findUnique({
     where: { codigo: 'TI-001' },
   })
-
   const utiDepartment = await prisma.department.findUnique({
     where: { codigo: 'UTI-001' },
   })
 
-  const adminRole = await prisma.role.findUnique({
-    where: { name: UserRole.ADMIN },
-  })
-
-  const gestorRole = await prisma.role.findUnique({
-    where: { name: UserRole.GESTOR },
-  })
-
-  const funcionarioRole = await prisma.role.findUnique({
-    where: { name: UserRole.FUNCIONARIO },
-  })
-
-  if (
-    !tiDepartment ||
-    !utiDepartment ||
-    !adminRole ||
-    !gestorRole ||
-    !funcionarioRole
-  ) {
-    throw new Error('Error on role or department generation')
+  if (!tiDepartment || !utiDepartment) {
+    throw new Error('Error on department generation')
   }
 
   const adminTI = await prisma.user.create({
@@ -75,7 +48,7 @@ async function main() {
       email: 'admin.ti@hospital.com',
       password: await hashPassword('admin.ti@hospital.com'),
       department_id: tiDepartment.id,
-      role_id: adminRole.id,
+      role: Role.ADMIN,
     },
   })
 
@@ -85,7 +58,7 @@ async function main() {
       email: 'gestor.uti.diurno@hospital.com',
       password: await hashPassword('gestor.uti.diurno@hospital.com'),
       department_id: utiDepartment.id,
-      role_id: gestorRole.id,
+      role: Role.MANAGER,
     },
   })
 
@@ -95,7 +68,7 @@ async function main() {
       email: 'gestor.uti.noturno@hospital.com',
       password: await hashPassword('gestor.uti.noturno@hospital.com'),
       department_id: utiDepartment.id,
-      role_id: gestorRole.id,
+      role: Role.MANAGER,
     },
   })
 
@@ -106,7 +79,7 @@ async function main() {
         email: 'enfermeiro1.uti@hospital.com',
         password: await hashPassword('enfermeiro1.uti@hospital.com'),
         department_id: utiDepartment.id,
-        role_id: funcionarioRole.id,
+        role: Role.USER,
       },
     }),
     prisma.user.create({
@@ -115,7 +88,7 @@ async function main() {
         email: 'enfermeiro2.uti@hospital.com',
         password: await hashPassword('enfermeiro2.uti@hospital.com'),
         department_id: utiDepartment.id,
-        role_id: funcionarioRole.id,
+        role: Role.USER,
       },
     }),
     prisma.user.create({
@@ -124,7 +97,7 @@ async function main() {
         email: 'enfermeiro3.uti@hospital.com',
         password: await hashPassword('enfermeiro3.uti@hospital.com'),
         department_id: utiDepartment.id,
-        role_id: funcionarioRole.id,
+        role: Role.USER,
       },
     }),
     prisma.user.create({
@@ -133,7 +106,7 @@ async function main() {
         email: 'enfermeiro4.uti@hospital.com',
         password: await hashPassword('enfermeiro4.uti@hospital.com'),
         department_id: utiDepartment.id,
-        role_id: funcionarioRole.id,
+        role: Role.USER,
       },
     }),
     prisma.user.create({
@@ -142,7 +115,7 @@ async function main() {
         email: 'enfermeiro5.uti@hospital.com',
         password: await hashPassword('enfermeiro5.uti@hospital.com'),
         department_id: utiDepartment.id,
-        role_id: funcionarioRole.id,
+        role: Role.USER,
       },
     }),
     prisma.user.create({
@@ -151,7 +124,7 @@ async function main() {
         email: 'enfermeiro6.uti@hospital.com',
         password: await hashPassword('enfermeiro6.uti@hospital.com'),
         department_id: utiDepartment.id,
-        role_id: funcionarioRole.id,
+        role: Role.USER,
       },
     }),
   ])
@@ -159,21 +132,21 @@ async function main() {
   const tiShift = await prisma.shift.create({
     data: {
       department_id: tiDepartment.id,
-      tipo: ShiftType.DIURNO,
+      tipo: ShiftType.DIURNAL,
     },
   })
 
   const utiDiurnoShift = await prisma.shift.create({
     data: {
       department_id: utiDepartment.id,
-      tipo: ShiftType.DIURNO,
+      tipo: ShiftType.DIURNAL,
     },
   })
 
   const utiNoturnoShift = await prisma.shift.create({
     data: {
       department_id: utiDepartment.id,
-      tipo: ShiftType.NOTURNO,
+      tipo: ShiftType.NOCTURNAL,
     },
   })
 
@@ -191,31 +164,31 @@ async function main() {
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
-        dia_semana: WeekDay.SEGUNDA,
+        dia_semana: WeekDay.MONDAY,
         data: new Date('2024-03-25'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
-        dia_semana: WeekDay.TERCA,
+        dia_semana: WeekDay.TUESDAY,
         data: new Date('2024-03-26'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
-        dia_semana: WeekDay.QUARTA,
+        dia_semana: WeekDay.WEDNESDAY,
         data: new Date('2024-03-27'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
-        dia_semana: WeekDay.QUINTA,
+        dia_semana: WeekDay.THURSDAY,
         data: new Date('2024-03-28'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
-        dia_semana: WeekDay.SEXTA,
+        dia_semana: WeekDay.FRIDAY,
         data: new Date('2024-03-29'),
       },
     ],
@@ -233,9 +206,9 @@ async function main() {
       })
 
       const workDays = [
-        [WeekDay.SEGUNDA, WeekDay.QUARTA],
-        [WeekDay.TERCA, WeekDay.QUINTA],
-        [WeekDay.QUARTA, WeekDay.SEXTA],
+        [WeekDay.MONDAY, WeekDay.WEDNESDAY],
+        [WeekDay.TUESDAY, WeekDay.THURSDAY],
+        [WeekDay.WEDNESDAY, WeekDay.FRIDAY],
       ]
 
       const selectedShift = index < 3 ? utiDiurnoShift : utiNoturnoShift
@@ -244,11 +217,11 @@ async function main() {
       await prisma.scheduleShift.createMany({
         data: selectedWorkDays.map((day) => {
           const dayMap = {
-            SEGUNDA: 25,
-            TERCA: 26,
-            QUARTA: 27,
-            QUINTA: 28,
-            SEXTA: 29,
+            MONDAY: 25,
+            TUESDAY: 26,
+            WEDNESDAY: 27,
+            THURSDAY: 28,
+            FRIDAY: 29,
           }
 
           return {
@@ -270,7 +243,7 @@ async function main() {
         applicant_id: funcionariosUTI[0].id,
         receptor_id: funcionariosUTI[1].id,
         department_id: utiDepartment.id,
-        status: ShiftExchangeStatus.PENDENTE,
+        status: ShiftExchangeStatus.PENDING,
         origin_shift_id: utiDiurnoShift.id,
         destination_id: utiNoturnoShift.id,
         motivo: 'Necessidade de ajuste na escala',
@@ -279,7 +252,7 @@ async function main() {
         applicant_id: funcionariosUTI[3].id,
         receptor_id: funcionariosUTI[4].id,
         department_id: utiDepartment.id,
-        status: ShiftExchangeStatus.PENDENTE,
+        status: ShiftExchangeStatus.PENDING,
         origin_shift_id: utiNoturnoShift.id,
         destination_id: utiDiurnoShift.id,
         motivo: 'Compromisso pessoal',
