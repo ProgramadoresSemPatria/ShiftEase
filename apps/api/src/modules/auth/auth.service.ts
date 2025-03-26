@@ -38,7 +38,7 @@ export class AuthService {
   }
 
   async signup(signupDto: SignupDto) {
-    const { name, email, password } = signupDto
+    const { name, email, password, department_id } = signupDto
 
     const emailTaken = await this.usersRepo.findUnique({
       where: { email },
@@ -55,6 +55,8 @@ export class AuthService {
         name: name,
         email: email,
         password: hashedPassword,
+        department_id, //! buscar pelo código do departamento
+        role_id: '7569bc42-3163-4275-8e01-2b608b436ab8', //!! remove hard code, setar como padrão o role funcionário
       },
     })
 
