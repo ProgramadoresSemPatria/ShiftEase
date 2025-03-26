@@ -17,11 +17,14 @@ export const Header = () => {
 			</Link>
 
 			{/* Login/Get started */}
-			<div className="md:flex gap-5 font-bold hidden text-white">
+			<motion.div
+				className="md:flex gap-5 font-bold hidden text-white"
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ opacity: { duration: 2 } }}
+			>
 				<Link to={"/login"} className="cursor-pointer ">
 					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
 						whileHover={{ scale: 1.15 }}
 						className="border-1 border-orange-600 text-orange-600 rounded-md p-2"
 					>
@@ -30,15 +33,13 @@ export const Header = () => {
 				</Link>
 				<Link to={"/register"}>
 					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
 						whileHover={{ scale: 1.15 }}
 						className="bg-orange-600 rounded-md p-2"
 					>
 						Get Started
 					</motion.div>
 				</Link>
-			</div>
+			</motion.div>
 
 			{/* Mobile Menu */}
 

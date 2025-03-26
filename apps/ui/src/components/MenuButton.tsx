@@ -40,16 +40,16 @@ export const MenuButton = () => {
 				</motion.div>
 			</label>
 			{isOpen && (
-				<div className="absolute top-12 right-0 w-40 bg-white dark:bg-neutral-800 shadow-lg rounded-md p-4 flex flex-col gap-2 z-10">
+				<div className="absolute top-12 right-0 w-40 bg-zinc-950 dark:bg-neutral-800 shadow-lg rounded-md p-4 flex flex-col gap-2 z-10">
 					<Link
 						to="/login"
-						className="text-neutral-900 dark:text-white hover:text-primary-500"
+						className="text-orange-600 dark:text-white hover:text-primary-500"
 					>
 						Login
 					</Link>
 					<Link
 						to="/register"
-						className="text-neutral-900 dark:text-white hover:text-primary-500"
+						className="text-orange-600 dark:text-white hover:text-primary-500"
 					>
 						Get Started
 					</Link>
