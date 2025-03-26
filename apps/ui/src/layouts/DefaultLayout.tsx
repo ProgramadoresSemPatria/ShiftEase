@@ -3,7 +3,7 @@ import { Header } from "../components/Header";
 
 export const DefaultLayout = () => {
 	return (
-		<div>
+		<div className="bg-zinc-950 min-h-screen">
 			<Header />
 			<Outlet />
 		</div>
