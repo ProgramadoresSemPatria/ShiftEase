@@ -56,7 +56,6 @@ export class AuthService {
         email: email,
         password: hashedPassword,
         department_id, //! buscar pelo código do departamento
-        role_id: '7569bc42-3163-4275-8e01-2b608b436ab8', //!! remove hard code, setar como padrão o role funcionário
       },
     })
 
