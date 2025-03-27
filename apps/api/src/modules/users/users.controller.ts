@@ -8,7 +8,9 @@ import {
 } from '@nestjs/common'
 
 import { ActiveUserId } from '@shared/decorators/ActiveUserId'
+import { Roles } from '@shared/decorators/roles.decorator'
 import { UpdateUserRoleDto } from './dto/update-user-role.dto'
+import { Role } from './roles/entities/Role'
 import { UsersService } from './users.service'
 
 @Controller('users')
@@ -20,7 +22,7 @@ export class UsersController {
     return this.usersService.getUserById(userId)
   }
 
-  //@AdminDecorator
+  @Roles(Role.ADMIN)
   @Put('/update-user-role/:userId')
   updateUserRole(
     @Param('userId', ParseUUIDPipe) userId: string,
