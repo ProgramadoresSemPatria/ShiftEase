@@ -1,4 +1,4 @@
-import { RolesGuard } from '@modules/users/roles/roles.guard'
+import { RoleGuard } from '@modules/users/roles/role.guard'
 import { UsersModule } from '@modules/users/users.module'
 import { Module } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
@@ -16,7 +16,7 @@ import { AuthModule } from './modules/auth/auth.module'
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard,
+      useClass: RoleGuard,
     },
   ],
 })
