@@ -21,21 +21,21 @@ async function main() {
     data: [
       {
         name: 'Tecnologia da Informação',
-        codigo: 'TI-001',
+        code: 'TI-001',
       },
       {
         name: 'Unidade de Terapia Intensiva',
-        codigo: 'UTI-001',
+        code: 'UTI-001',
       },
     ],
     skipDuplicates: true,
   })
 
   const tiDepartment = await prisma.department.findUnique({
-    where: { codigo: 'TI-001' },
+    where: { code: 'TI-001' },
   })
   const utiDepartment = await prisma.department.findUnique({
-    where: { codigo: 'UTI-001' },
+    where: { code: 'UTI-001' },
   })
 
   if (!tiDepartment || !utiDepartment) {
@@ -132,21 +132,21 @@ async function main() {
   const tiShift = await prisma.shift.create({
     data: {
       department_id: tiDepartment.id,
-      tipo: ShiftType.DIURNAL,
+      type: ShiftType.DIURNAL,
     },
   })
 
   const utiDiurnoShift = await prisma.shift.create({
     data: {
       department_id: utiDepartment.id,
-      tipo: ShiftType.DIURNAL,
+      type: ShiftType.DIURNAL,
     },
   })
 
   const utiNoturnoShift = await prisma.shift.create({
     data: {
       department_id: utiDepartment.id,
-      tipo: ShiftType.NOCTURNAL,
+      type: ShiftType.NOCTURNAL,
     },
   })
 
@@ -165,31 +165,31 @@ async function main() {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
         dia_semana: WeekDay.MONDAY,
-        data: new Date('2024-03-25'),
+        date: new Date('2024-03-25'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
         dia_semana: WeekDay.TUESDAY,
-        data: new Date('2024-03-26'),
+        date: new Date('2024-03-26'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
         dia_semana: WeekDay.WEDNESDAY,
-        data: new Date('2024-03-27'),
+        date: new Date('2024-03-27'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
         dia_semana: WeekDay.THURSDAY,
-        data: new Date('2024-03-28'),
+        date: new Date('2024-03-28'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
         dia_semana: WeekDay.FRIDAY,
-        data: new Date('2024-03-29'),
+        date: new Date('2024-03-29'),
       },
     ],
   })
@@ -228,7 +228,7 @@ async function main() {
             schedule_id: schedule.id,
             shift_id: selectedShift.id,
             dia_semana: day,
-            data: new Date(`2024-03-${dayMap[day]}`),
+            date: new Date(`2024-03-${dayMap[day]}`),
           }
         }),
       })
@@ -246,7 +246,7 @@ async function main() {
         status: ShiftExchangeStatus.PENDING,
         origin_shift_id: utiDiurnoShift.id,
         destination_id: utiNoturnoShift.id,
-        motivo: 'Necessidade de ajuste na escala',
+        reason: 'Necessidade de ajuste na escala',
       },
       {
         applicant_id: funcionariosUTI[3].id,
@@ -255,7 +255,7 @@ async function main() {
         status: ShiftExchangeStatus.PENDING,
         origin_shift_id: utiNoturnoShift.id,
         destination_id: utiDiurnoShift.id,
-        motivo: 'Compromisso pessoal',
+        reason: 'Compromisso pessoal',
       },
     ],
   })
