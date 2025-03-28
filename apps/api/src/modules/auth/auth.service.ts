@@ -1,6 +1,8 @@
+import { DepartmentsService } from '@modules/departments/departments.service'
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
@@ -14,6 +16,7 @@ export class AuthService {
   constructor(
     private readonly usersRepo: UsersRepository,
     private readonly jwtService: JwtService,
+    private readonly departmentsService: DepartmentsService,
   ) {}
 
   async signin(signinDto: SigninDto) {
@@ -37,7 +40,7 @@ export class AuthService {
   }
 
   async signup(signupDto: SignupDto) {
-    const { name, email, password, department_id } = signupDto
+    const { name, email, password, departmentCode } = signupDto
 
     const emailTaken = await this.usersRepo.findUnique({
       where: { email },
@@ -47,6 +50,12 @@ export class AuthService {
       throw new ConflictException('This e-mail is already in use!')
     }
 
+    const department = await this.departmentsService.findUniqueDepartment(
+      undefined,
+      departmentCode,
+    )
+    if (!department) throw new NotFoundException('Department not found')
+
     const hashedPassword = await hash(password, 12)
 
     const user = await this.usersRepo.create({
@@ -54,7 +63,7 @@ export class AuthService {
         name: name,
         email: email,
         password: hashedPassword,
-        department_id, //! buscar pelo código do departamento
+        department_id: department.id,
       },
     })
 
