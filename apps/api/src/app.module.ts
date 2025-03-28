@@ -5,9 +5,10 @@ import { APP_GUARD } from '@nestjs/core'
 import { DatabaseModule } from '@shared/database/database.module'
 import { AuthGuard } from './modules/auth/auth.guard'
 import { AuthModule } from './modules/auth/auth.module'
+import { DepartmentsModule } from '@modules/departments/departments.module'
 
 @Module({
-  imports: [AuthModule, DatabaseModule, UsersModule],
+  imports: [AuthModule, DatabaseModule, UsersModule, DepartmentsModule],
   controllers: [],
   providers: [
     {
