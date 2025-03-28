@@ -7,10 +7,12 @@ import {
   Param,
   Delete,
 } from '@nestjs/common'
-import { SchedulesService } from './schedules.service'
+import { NecessaryRole } from '@shared/decorators/roles.decorator'
 import { CreateScheduleDto } from './dto/create-schedule.dto'
 import { UpdateScheduleDto } from './dto/update-schedule.dto'
+import { SchedulesService } from './schedules.service'
 
+@NecessaryRole(Role.MANAGER)
 @Controller('schedules')
 export class SchedulesController {
   constructor(private readonly schedulesService: SchedulesService) {}
