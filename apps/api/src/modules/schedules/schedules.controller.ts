@@ -22,11 +22,6 @@ export class SchedulesController {
     return this.schedulesService.create(createScheduleDto)
   }
 
-  @Get()
-  findAll() {
-    return this.schedulesService.findAll()
-  }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.schedulesService.findOne(+id)
