@@ -32,7 +32,7 @@ export const LoginForm = () => {
 		setIsLoading(true);
 		setError(null);
 		if (email && password) {
-			const isLogged = await auth.signin(email, password);
+			const isLogged = await auth.signIn(email, password);
 			if (isLogged) {
 				navigate("/dashboard");
 			} else {
