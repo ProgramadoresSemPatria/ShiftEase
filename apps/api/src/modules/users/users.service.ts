@@ -27,7 +27,7 @@ export class UsersService {
             end_date: true,
             schedule_shifts: {
               select: {
-                dia_semana: true,
+                day_week: true,
                 date: true,
                 shift: {
                   select: {
