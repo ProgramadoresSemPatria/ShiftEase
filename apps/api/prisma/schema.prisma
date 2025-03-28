@@ -103,7 +103,7 @@ model ScheduleShift {
   id          String   @id @default(uuid()) @db.Uuid
   schedule_id String   @db.Uuid
   shift_id    String   @db.Uuid
-  dia_semana  WeekDay
+  day_week    WeekDay
   date        DateTime
 
   schedule Schedule @relation(fields: [schedule_id], references: [id])

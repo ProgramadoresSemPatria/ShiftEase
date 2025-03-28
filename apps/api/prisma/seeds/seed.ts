@@ -164,31 +164,31 @@ async function main() {
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
-        dia_semana: WeekDay.MONDAY,
+        day_week: WeekDay.MONDAY,
         date: new Date('2024-03-25'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
-        dia_semana: WeekDay.TUESDAY,
+        day_week: WeekDay.TUESDAY,
         date: new Date('2024-03-26'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
-        dia_semana: WeekDay.WEDNESDAY,
+        day_week: WeekDay.WEDNESDAY,
         date: new Date('2024-03-27'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
-        dia_semana: WeekDay.THURSDAY,
+        day_week: WeekDay.THURSDAY,
         date: new Date('2024-03-28'),
       },
       {
         schedule_id: adminSchedule.id,
         shift_id: tiShift.id,
-        dia_semana: WeekDay.FRIDAY,
+        day_week: WeekDay.FRIDAY,
         date: new Date('2024-03-29'),
       },
     ],
@@ -227,7 +227,7 @@ async function main() {
           return {
             schedule_id: schedule.id,
             shift_id: selectedShift.id,
-            dia_semana: day,
+            day_week: day,
             date: new Date(`2024-03-${dayMap[day]}`),
           }
         }),
