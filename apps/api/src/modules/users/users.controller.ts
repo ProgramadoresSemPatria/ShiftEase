@@ -22,6 +22,11 @@ export class UsersController {
     return this.usersService.getUserById(userId)
   }
 
+  @Get('/find-schedules')
+  findUserSchedules(@ActiveUserId() userId: string) {
+    return this.usersService.findUserSchedules(userId)
+  }
+
   @NecessaryRole(Role.ADMIN)
   @Put('/update-user-role/:userId')
   updateUserRole(
