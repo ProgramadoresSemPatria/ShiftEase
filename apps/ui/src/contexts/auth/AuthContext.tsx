@@ -1,8 +1,12 @@
-import type { User } from "@/types/user";
 import { createContext } from "react";
 
+export type contextUser = {
+	email: string;
+	name: string;
+};
+
 export type AuthContextType = {
-	user: User | null;
+	user: contextUser | null;
 	signIn: (email: string, password: string) => Promise<boolean>;
 	signOut: () => void;
 };

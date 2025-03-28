@@ -1,4 +1,3 @@
-import type { User } from "@/types/user";
 import axios from "axios";
 
 const api = axios.create({
@@ -6,35 +5,49 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-	const token = localStorage.getItem("authToken");
+	const token = localStorage.getItem("accessToken");
 	if (token) {
 		config.headers.Authorization = `Bearer ${token}`;
 	}
 	return config;
 });
 
+type UserResponse = {
+	email: string;
+	name: string;
+};
+
+type SignInResponse = {
+	accessToken: string;
+};
+
 export const useApi = () => ({
-	validateToken: async (token: string) => {
+	validateToken: async (): Promise<UserResponse | null> => {
 		try {
-			const response = await api.post("/validate", { token });
+			const response = await api.get("/users/me");
+			console.log(response);
 			return response.data;
 		} catch (error) {
 			console.error("Token validation failed:", error);
-			return { user: null };
+			return null;
 		}
 	},
-	signIn: async (email: string, password: string) => {
+	signIn: async (
+		email: string,
+		password: string,
+	): Promise<SignInResponse | null> => {
 		try {
-			const response = await api.post("/signIn", { email, password });
-			return response.data;
+			const response = await api.post("/auth/signin", { email, password });
+			const token = response.data;
+			return token;
 		} catch (error) {
 			console.error("Sign in failed:", error);
 			return null;
 		}
 	},
-	signOut: async () => {
+	signOut: async (): Promise<{ status: boolean }> => {
 		try {
-			const response = await api.post("/signOut");
+			const response = await api.post("/auth/signout");
 			return response.data;
 		} catch (error) {
 			console.error("Sign out failed:", error);

@@ -39,6 +39,7 @@ export const LoginForm = () => {
 				setError("Invalid email or password");
 			}
 		}
+		setIsLoading(false);
 	};
 
 	return (
