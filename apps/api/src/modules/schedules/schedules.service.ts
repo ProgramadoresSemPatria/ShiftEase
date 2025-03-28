@@ -5,22 +5,22 @@ import { UpdateScheduleDto } from './dto/update-schedule.dto'
 @Injectable()
 export class SchedulesService {
   create(createScheduleDto: CreateScheduleDto) {
-    return 'This action adds a new schedule'
+    const { name, user_id, start_date, end_date } = createScheduleDto
   }
 
   findAll() {
     return `This action returns all schedules`
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} schedule`
   }
 
-  update(id: number, updateScheduleDto: UpdateScheduleDto) {
+  update(id: string, updateScheduleDto: UpdateScheduleDto) {
     return `This action updates a #${id} schedule`
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} schedule`
   }
 }
