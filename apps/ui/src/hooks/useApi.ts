@@ -23,18 +23,18 @@ export const useApi = () => ({
 			return { user: null };
 		}
 	},
-	signin: async (email: string, password: string) => {
+	signIn: async (email: string, password: string) => {
 		try {
-			const response = await api.post("/signin", { email, password });
+			const response = await api.post("/signIn", { email, password });
 			return response.data;
 		} catch (error) {
 			console.error("Sign in failed:", error);
 			return null;
 		}
 	},
-	signout: async () => {
+	signOut: async () => {
 		try {
-			const response = await api.post("/signout");
+			const response = await api.post("/signOut");
 			return response.data;
 		} catch (error) {
 			console.error("Sign out failed:", error);
