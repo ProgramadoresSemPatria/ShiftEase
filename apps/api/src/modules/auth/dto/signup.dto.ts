@@ -1,10 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  IsUUID,
-  MinLength,
-} from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator'
 
 export class SignupDto {
   @IsString()
@@ -23,6 +17,5 @@ export class SignupDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsUUID()
-  department_id: string
+  departmentCode: string
 }

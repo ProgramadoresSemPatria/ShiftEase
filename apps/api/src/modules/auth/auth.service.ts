@@ -1,12 +1,13 @@
+import { DepartmentsService } from '@modules/departments/departments.service'
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { UsersRepository } from '@shared/database/repositories/users.repositories'
 import { compare, hash } from 'bcryptjs'
-
-import { UsersRepository } from 'src/shared/database/repositories/users.repositories'
 import { SigninDto } from './dto/signin.dto'
 import { SignupDto } from './dto/signup.dto'
 
@@ -15,6 +16,7 @@ export class AuthService {
   constructor(
     private readonly usersRepo: UsersRepository,
     private readonly jwtService: JwtService,
+    private readonly departmentsService: DepartmentsService,
   ) {}
 
   async signin(signinDto: SigninDto) {
@@ -32,13 +34,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials.')
     }
 
-    const accessToken = await this.generateAccessToken(user.id)
+    const accessToken = await this.generateAccessToken(user.id, user.role)
 
     return { accessToken }
   }
 
   async signup(signupDto: SignupDto) {
-    const { name, email, password, department_id } = signupDto
+    const { name, email, password, departmentCode } = signupDto
 
     const emailTaken = await this.usersRepo.findUnique({
       where: { email },
@@ -48,6 +50,12 @@ export class AuthService {
       throw new ConflictException('This e-mail is already in use!')
     }
 
+    const department = await this.departmentsService.findUniqueDepartment(
+      undefined,
+      departmentCode,
+    )
+    if (!department) throw new NotFoundException('Department not found')
+
     const hashedPassword = await hash(password, 12)
 
     const user = await this.usersRepo.create({
@@ -55,17 +63,16 @@ export class AuthService {
         name: name,
         email: email,
         password: hashedPassword,
-        department_id, //! buscar pelo código do departamento
-        role_id: '7569bc42-3163-4275-8e01-2b608b436ab8', //!! remove hard code, setar como padrão o role funcionário
+        department_id: department.id,
       },
     })
 
-    const accessToken = await this.generateAccessToken(user.id)
+    const accessToken = await this.generateAccessToken(user.id, user.role)
 
     return { accessToken }
   }
 
-  private generateAccessToken(userId: string) {
-    return this.jwtService.signAsync({ sub: userId })
+  private generateAccessToken(userId: string, role: string) {
+    return this.jwtService.signAsync({ sub: userId, role })
   }
 }

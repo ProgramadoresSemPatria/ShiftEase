@@ -1,32 +1,25 @@
-/*
-  Warnings:
-
-  - Added the required column `department_id` to the `users` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `role_id` to the `users` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- CreateEnum
-CREATE TYPE "user_roles" AS ENUM ('FUNCIONARIO', 'GESTOR', 'ADMIN');
+CREATE TYPE "roles" AS ENUM ('USER', 'MANAGER', 'ADMIN');
 
 -- CreateEnum
-CREATE TYPE "shift_exchange_status" AS ENUM ('PENDENTE', 'APROVADO_RECEPTOR', 'APROVADO_GESTOR', 'REJEITADO');
+CREATE TYPE "shift_exchange_status" AS ENUM ('PENDING', 'APPROVED_RECEIVER', 'APPROVED_MANAGER', 'REJECTED');
 
 -- CreateEnum
-CREATE TYPE "week_days" AS ENUM ('SEGUNDA', 'TERCA', 'QUARTA', 'QUINTA', 'SEXTA', 'SABADO', 'DOMINGO');
+CREATE TYPE "week_days" AS ENUM ('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY');
 
 -- CreateEnum
-CREATE TYPE "shift_types" AS ENUM ('DIURNO', 'NOTURNO');
-
--- AlterTable
-ALTER TABLE "users" ADD COLUMN     "department_id" UUID NOT NULL,
-ADD COLUMN     "role_id" UUID NOT NULL;
+CREATE TYPE "shift_types" AS ENUM ('DIURNAL', 'NOCTURNAL');
 
 -- CreateTable
-CREATE TABLE "roles" (
+CREATE TABLE "users" (
     "id" UUID NOT NULL,
-    "name" "user_roles" NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "department_id" UUID NOT NULL,
+    "role" "roles" NOT NULL DEFAULT 'USER',
 
-    CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -75,7 +68,7 @@ CREATE TABLE "shift_exchange_requests" (
     "applicant_id" UUID NOT NULL,
     "receptor_id" UUID NOT NULL,
     "department_id" UUID NOT NULL,
-    "status" "shift_exchange_status" NOT NULL DEFAULT 'PENDENTE',
+    "status" "shift_exchange_status" NOT NULL DEFAULT 'PENDING',
     "origin_shift_id" UUID NOT NULL,
     "destination_id" UUID NOT NULL,
     "start_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -86,19 +79,19 @@ CREATE TABLE "shift_exchange_requests" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "departments_codigo_key" ON "departments"("codigo");
 
 -- AddForeignKey
-ALTER TABLE "users" ADD CONSTRAINT "users_department_id_fkey" FOREIGN KEY ("department_id") REFERENCES "departments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "users" ADD CONSTRAINT "users_department_id_fkey" FOREIGN KEY ("department_id") REFERENCES "departments"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "shifts" ADD CONSTRAINT "shifts_department_id_fkey" FOREIGN KEY ("department_id") REFERENCES "departments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "schedules" ADD CONSTRAINT "schedules_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "schedules" ADD CONSTRAINT "schedules_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "schedule_shifts" ADD CONSTRAINT "schedule_shifts_schedule_id_fkey" FOREIGN KEY ("schedule_id") REFERENCES "schedules"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
