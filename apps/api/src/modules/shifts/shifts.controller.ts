@@ -1,19 +1,20 @@
+import { Role } from '@modules/users/roles/entities/Role'
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  Query,
+  Get,
+  HttpCode,
+  Param,
   ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common'
-import { ShiftsService } from './services/shifts.service'
+import { NecessaryRole } from '@shared/decorators/roles.decorator'
 import { CreateShiftDto } from './dto/create-shift.dto'
 import { UpdateShiftDto } from './dto/update-shift.dto'
-import { NecessaryRole } from '@shared/decorators/roles.decorator'
-import { Role } from '@modules/users/roles/entities/Role'
+import { ShiftsService } from './services/shifts.service'
 
 @Controller('shifts')
 export class ShiftsController {
@@ -49,6 +50,7 @@ export class ShiftsController {
 
   @NecessaryRole(Role.ADMIN, Role.MANAGER)
   @Delete(':id')
+  @HttpCode(204)
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.shiftsService.remove(id)
   }
