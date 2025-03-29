@@ -1,13 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { CreateShiftDto } from './dto/create-shift.dto'
-import { UpdateShiftDto } from './dto/update-shift.dto'
+import { CreateShiftDto } from '../dto/create-shift.dto'
+import { UpdateShiftDto } from '../dto/update-shift.dto'
 import { ShiftsRepository } from '@shared/database/repositories/shifts.repositories'
 import { FindUniqueDepartment } from '@modules/departments/services/findUniqueDepartmet.service'
+import { FindShiftService } from './findShift.service'
 
 @Injectable()
 export class ShiftsService {
   constructor(
     private readonly shiftsRepo: ShiftsRepository,
+    private readonly findShiftService: FindShiftService,
     private readonly findUniqueDepartmet: FindUniqueDepartment,
   ) {}
 
@@ -34,19 +36,35 @@ export class ShiftsService {
     return shift
   }
 
-  findAll() {
-    return `This action returns all shifts`
+  findAll(departmentId?: string) {
+    return this.shiftsRepo.findMany({
+      where: departmentId ? { department_id: departmentId } : undefined,
+      include: {
+        department: true,
+      },
+    })
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} shift`
+  async findOne(id: string) {
+    const shift = await this.findShiftService.find(id)
+    if (!shift) throw new NotFoundException('Shift not found')
+
+    return shift
   }
 
-  update(id: number, updateShiftDto: UpdateShiftDto) {
-    return `This action updates a #${id} shift`
+  async update(id: string, updateShiftDto: UpdateShiftDto) {
+    await this.findOne(id)
+
+    return this.shiftsRepo.update({
+      where: { id },
+      data: { type: updateShiftDto.type },
+      include: {
+        department: true,
+      },
+    })
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} shift`
   }
 }
