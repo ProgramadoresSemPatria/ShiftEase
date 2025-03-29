@@ -4,8 +4,7 @@ import { ShiftType } from '../entities/ShiftType'
 export class CreateShiftDto {
   @IsNotEmpty()
   @IsString()
-  @IsUUID()
-  departmentId: string
+  departmentCode: string
 
   @IsNotEmpty()
   @IsEnum(ShiftType)
