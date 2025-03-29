@@ -23,7 +23,9 @@ export class SchedulesService {
   }
 
   findAll() {
-    return this.schedulesRepo.findMany({})
+    return this.schedulesRepo.findMany({
+      include: { schedule_shifts: true },
+    })
   }
 
   async findOne(id: string) {
