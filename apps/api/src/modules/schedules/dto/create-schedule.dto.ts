@@ -7,13 +7,13 @@ export class CreateScheduleDto {
 
   @IsString()
   @IsNotEmpty()
-  user_id: string
+  userId: string
 
   @IsNotEmpty()
   @IsDate()
-  start_date: Date
+  startDate: Date
 
   @IsNotEmpty()
   @IsDate()
-  end_date: Date
+  endDate: Date
 }
