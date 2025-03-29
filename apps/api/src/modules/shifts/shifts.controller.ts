@@ -13,11 +13,11 @@ import { UpdateShiftDto } from './dto/update-shift.dto'
 import { NecessaryRole } from '@shared/decorators/roles.decorator'
 import { Role } from '@modules/users/roles/entities/Role'
 
-@NecessaryRole(Role.MANAGER)
 @Controller('shifts')
 export class ShiftsController {
   constructor(private readonly shiftsService: ShiftsService) {}
 
+  @NecessaryRole(Role.MANAGER, Role.ADMIN)
   @Post()
   create(@Body() createShiftDto: CreateShiftDto) {
     return this.shiftsService.create(createShiftDto)
