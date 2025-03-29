@@ -1,3 +1,4 @@
+import { ShiftType } from '@modules/shifts/entities/ShiftType'
 import { Role } from '@modules/users/roles/entities/Role'
 import {
   Body,
@@ -8,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common'
 import { NecessaryRole } from '@shared/decorators/roles.decorator'
 import { CreateScheduleDto } from './dto/create-schedule.dto'
@@ -26,8 +28,20 @@ export class SchedulesController {
 
   @NecessaryRole(Role.USER, Role.MANAGER)
   @Get()
-  findAll() {
-    return this.schedulesService.findAll()
+  findAll(
+    @Query('search') search?: string,
+    @Query('departmentId') departmentId?: string,
+    @Query('shiftType') shiftType?: ShiftType,
+    @Query('from') from?: Date,
+    @Query('to') to?: Date,
+  ) {
+    return this.schedulesService.findAll({
+      search,
+      departmentId,
+      shiftType,
+      from,
+      to,
+    })
   }
 
   @NecessaryRole(Role.USER, Role.MANAGER)
