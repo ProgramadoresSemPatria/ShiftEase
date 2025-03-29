@@ -55,6 +55,7 @@ export const LoginForm = () => {
 				type="text"
 				placeholder="Email"
 				className="bg-white p-2 rounded-md"
+				disabled={isLoading}
 			/>
 			{errors.email?.message && (
 				<div className="text-red-500">{errors.email.message}</div>
@@ -67,6 +68,7 @@ export const LoginForm = () => {
 				type="password"
 				placeholder="Password"
 				className="bg-white p-2 rounded-md"
+				disabled={isLoading}
 			/>
 			{errors.password?.message && (
 				<div className="text-red-500">{errors.password.message}</div>
