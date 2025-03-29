@@ -1,3 +1,3 @@
 export const Dashboard = () => {
-	return <div>cant see this whithout being logged in</div>;
+	return <div>cant see this without being logged in</div>;
 };

@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }: { children: JSX.Element }) => {
 			if (token) {
 				const data = await api.validateToken();
 				if (data) {
-					console.log(data);
 					setUser(data);
 				} else {
 					localStorage.removeItem("accessToken");

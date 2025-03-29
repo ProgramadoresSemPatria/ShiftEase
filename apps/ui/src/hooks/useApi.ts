@@ -25,7 +25,6 @@ export const useApi = () => ({
 	validateToken: async (): Promise<UserResponse | null> => {
 		try {
 			const response = await api.get("/users/me");
-			console.log(response);
 			return response.data;
 		} catch (error) {
 			console.error("Token validation failed:", error);
