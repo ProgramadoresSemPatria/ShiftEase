@@ -73,6 +73,8 @@ export class ShiftsService {
     // const scheduleShiftsRequest = //! busca scheduleShift
     // if(scheduleShifts) throw new BadRequestException('This shift have a ScheduleShiftRequest vinculated')
 
-    return this.shiftsRepo.delete({ where: { id } })
+    await this.shiftsRepo.delete({ where: { id } })
+
+    return
   }
 }
