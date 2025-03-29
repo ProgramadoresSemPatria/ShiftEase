@@ -1,5 +1,6 @@
 import { DepartmentsModule } from '@modules/departments/departments.module'
 import { SchedulesModule } from '@modules/schedules/schedules.module'
+import { ShiftsModule } from '@modules/shifts/shifts.module'
 import { RoleGuard } from '@modules/users/roles/role.guard'
 import { UsersModule } from '@modules/users/users.module'
 import { Module } from '@nestjs/common'
@@ -15,6 +16,7 @@ import { AuthModule } from './modules/auth/auth.module'
     UsersModule,
     DepartmentsModule,
     SchedulesModule,
+    ShiftsModule,
   ],
   controllers: [],
   providers: [
