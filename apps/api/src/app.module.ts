@@ -6,9 +6,16 @@ import { DatabaseModule } from '@shared/database/database.module'
 import { AuthGuard } from './modules/auth/auth.guard'
 import { AuthModule } from './modules/auth/auth.module'
 import { DepartmentsModule } from '@modules/departments/departments.module'
+import { ShiftsModule } from '@modules/shifts/shifts.module'
 
 @Module({
-  imports: [AuthModule, DatabaseModule, UsersModule, DepartmentsModule],
+  imports: [
+    AuthModule,
+    DatabaseModule,
+    UsersModule,
+    DepartmentsModule,
+    ShiftsModule,
+  ],
   controllers: [],
   providers: [
     {

@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common'
 import { IsPublic } from '@shared/decorators/is-public.decorator'
 import { NecessaryRole } from '@shared/decorators/roles.decorator'
-import { DepartmentsService } from './departments.service'
+import { DepartmentsService } from './services/departments.service'
 import { CreateDepartmentDto } from './dto/create-department.dto'
 import { UpdateDepartmentDto } from './dto/update-department.dto'
 

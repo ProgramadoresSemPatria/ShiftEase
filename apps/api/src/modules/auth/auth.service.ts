@@ -1,4 +1,3 @@
-import { DepartmentsService } from '@modules/departments/departments.service'
 import {
   ConflictException,
   Injectable,
@@ -10,13 +9,14 @@ import { UsersRepository } from '@shared/database/repositories/users.repositorie
 import { compare, hash } from 'bcryptjs'
 import { SigninDto } from './dto/signin.dto'
 import { SignupDto } from './dto/signup.dto'
+import { FindUniqueDepartment } from '@modules/departments/services/findUniqueDepartmet.service'
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersRepo: UsersRepository,
     private readonly jwtService: JwtService,
-    private readonly departmentsService: DepartmentsService,
+    private readonly findUniqueDepartment: FindUniqueDepartment,
   ) {}
 
   async signin(signinDto: SigninDto) {
@@ -50,7 +50,7 @@ export class AuthService {
       throw new ConflictException('This e-mail is already in use!')
     }
 
-    const department = await this.departmentsService.findUniqueDepartment(
+    const department = await this.findUniqueDepartment.find(
       undefined,
       departmentCode,
     )
