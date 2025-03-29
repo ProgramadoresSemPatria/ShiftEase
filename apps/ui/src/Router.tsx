@@ -4,6 +4,7 @@ import { DefaultLayout } from "./layouts/DefaultLayout";
 import { Dashboard } from "./pages/Dashboard";
 import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
 
 export const Router = () => {
 	return (
@@ -13,6 +14,7 @@ export const Router = () => {
 					<Route index element={<LandingPage />} />
 				</Route>
 				<Route path="/login" element={<LoginPage />} />
+				<Route path="/register" element={<RegisterPage />} />
 			</Route>
 
 			<Route element={<AuthGuard isPrivate />}>
