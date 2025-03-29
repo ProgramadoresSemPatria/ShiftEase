@@ -1,8 +1,8 @@
+import { FindUniqueDepartment } from '@modules/departments/services/findUniqueDepartmet.service'
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { ShiftsRepository } from '@shared/database/repositories/shifts.repositories'
 import { CreateShiftDto } from '../dto/create-shift.dto'
 import { UpdateShiftDto } from '../dto/update-shift.dto'
-import { ShiftsRepository } from '@shared/database/repositories/shifts.repositories'
-import { FindUniqueDepartment } from '@modules/departments/services/findUniqueDepartmet.service'
 import { FindShiftService } from './findShift.service'
 
 @Injectable()
@@ -64,7 +64,15 @@ export class ShiftsService {
     })
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} shift`
+  async remove(id: string) {
+    await this.findOne(id)
+
+    // const scheduleShifts = //! busca scheduleShift
+    // if(scheduleShifts) throw new BadRequestException('This shift have a ScheduleShift vinculated')
+
+    // const scheduleShiftsRequest = //! busca scheduleShift
+    // if(scheduleShifts) throw new BadRequestException('This shift have a ScheduleShiftRequest vinculated')
+
+    return this.shiftsRepo.delete({ where: { id } })
   }
 }
