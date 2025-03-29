@@ -22,8 +22,38 @@ export class SchedulesService {
     })
   }
 
-  findAll() {
+  findAll(filters: {
+    search?: string
+    departmentId?: string
+    shiftType?: string
+    from?: Date
+    to?: Date
+  }) {
+    const where: any = {}
+
+    if (filters.search) {
+      where.name = { contains: filters.search, mode: 'insensitive' }
+    }
+
+    if (filters.departmentId) {
+      where.user = { department_id: filters.departmentId }
+    }
+
+    if (filters.shiftType) {
+      where.schedule_shifts = { some: { shift: { tipo: filters.shiftType } } }
+    }
+
+    if (filters.from && filters.to) {
+      where.start_date = { gte: new Date(filters.from) }
+      where.end_date = { lte: new Date(filters.to) }
+    } else if (filters.from) {
+      where.start_date = { gte: new Date(filters.from) }
+    } else if (filters.to) {
+      where.end_date = { lte: new Date(filters.to) }
+    }
+
     return this.schedulesRepo.findMany({
+      where,
       include: { schedule_shifts: true },
     })
   }
