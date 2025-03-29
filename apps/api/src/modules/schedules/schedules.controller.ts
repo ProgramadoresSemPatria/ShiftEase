@@ -14,7 +14,7 @@ import { CreateScheduleDto } from './dto/create-schedule.dto'
 import { UpdateScheduleDto } from './dto/update-schedule.dto'
 import { SchedulesService } from './schedules.service'
 
-@NecessaryRole(Role.MANAGER)
+@NecessaryRole(Role.MANAGER, Role.ADMIN)
 @Controller('schedules')
 export class SchedulesController {
   constructor(private readonly schedulesService: SchedulesService) {}
