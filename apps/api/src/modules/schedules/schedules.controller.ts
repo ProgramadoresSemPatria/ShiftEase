@@ -11,7 +11,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common'
-import { ApiBearerAuth } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiQuery } from '@nestjs/swagger'
 import { NecessaryRole } from '@shared/decorators/roles.decorator'
 import { CreateScheduleDto } from './dto/create-schedule.dto'
 import { UpdateScheduleDto } from './dto/update-schedule.dto'
@@ -30,6 +30,11 @@ export class SchedulesController {
 
   @NecessaryRole(Role.USER, Role.MANAGER)
   @Get()
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'departmentId', required: false, type: String })
+  @ApiQuery({ name: 'shiftType', required: false, enum: ShiftType })
+  @ApiQuery({ name: 'from', required: false, type: Date })
+  @ApiQuery({ name: 'to', required: false, type: Date })
   findAll(
     @Query('search') search?: string,
     @Query('departmentId') departmentId?: string,
