@@ -100,4 +100,17 @@ export class ShiftExchangeRequestService {
       where: { id: shiftExchangeRequestId },
     })
   }
+
+  async denyRequest(shiftExchangeRequestId: string) {
+    const requestExists = await this.shiftExchangeRequestRepo.findUnique({
+      where: { id: shiftExchangeRequestId },
+    })
+    if (!requestExists || requestExists.status !== 'APPROVED_RECEIVER')
+      throw new ForbiddenException("Can't deny this request")
+
+    return this.shiftExchangeRequestRepo.update({
+      data: { status: 'REJECTED' },
+      where: { id: shiftExchangeRequestId },
+    })
+  }
 }
