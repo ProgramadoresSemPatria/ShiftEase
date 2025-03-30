@@ -1,3 +1,4 @@
+import { ScheduleShiftsService } from '@modules/schedule-shifts/schedule-shifts.service'
 import { UsersService } from '@modules/users/users.service'
 import {
   ForbiddenException,
@@ -12,6 +13,7 @@ export class ShiftExchangeRequestService {
   constructor(
     private readonly shiftExchangeRequestRepo: ShiftExchangeRequestRepository,
     private readonly usersService: UsersService,
+    private readonly scheduleShiftsService: ScheduleShiftsService,
   ) {}
 
   async create(
@@ -94,6 +96,27 @@ export class ShiftExchangeRequestService {
     })
     if (!requestExists || requestExists.status !== 'APPROVED_RECEIVER')
       throw new ForbiddenException("Can't approve this request")
+
+    const originScheduleShift = await this.scheduleShiftsService.findFirst(
+      requestExists.origin_shift_id,
+    )
+    const destinationScheduleShift = await this.scheduleShiftsService.findFirst(
+      requestExists.destination_id,
+    )
+
+    if (!originScheduleShift || !destinationScheduleShift)
+      throw new NotFoundException('Schedule shifts not found')
+
+    await Promise.all([
+      this.scheduleShiftsService.swapScheduleShift(
+        requestExists.origin_shift_id,
+        requestExists.destination_id,
+      ),
+      this.scheduleShiftsService.swapScheduleShift(
+        requestExists.destination_id,
+        requestExists.origin_shift_id,
+      ),
+    ])
 
     return this.shiftExchangeRequestRepo.update({
       data: { status: 'APPROVED_MANAGER', end_date: new Date() },
