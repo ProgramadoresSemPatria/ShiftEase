@@ -10,16 +10,18 @@ import {
   Patch,
   Post,
 } from '@nestjs/common'
+import { ApiBearerAuth } from '@nestjs/swagger'
 import { IsPublic } from '@shared/decorators/is-public.decorator'
 import { NecessaryRole } from '@shared/decorators/roles.decorator'
-import { DepartmentsService } from './services/departments.service'
 import { CreateDepartmentDto } from './dto/create-department.dto'
 import { UpdateDepartmentDto } from './dto/update-department.dto'
+import { DepartmentsService } from './services/departments.service'
 
 @Controller('departments')
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentsService) {}
 
+  @ApiBearerAuth()
   @NecessaryRole(Role.ADMIN)
   @Post()
   create(@Body() createDepartmentDto: CreateDepartmentDto) {
@@ -32,6 +34,7 @@ export class DepartmentsController {
     return this.departmentsService.findAll()
   }
 
+  @ApiBearerAuth()
   @NecessaryRole(Role.ADMIN)
   @Patch(':id')
   update(
@@ -41,6 +44,7 @@ export class DepartmentsController {
     return this.departmentsService.update(id, updateDepartmentDto)
   }
 
+  @ApiBearerAuth()
   @NecessaryRole(Role.ADMIN)
   @Delete(':id')
   @HttpCode(204)
