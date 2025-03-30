@@ -43,6 +43,9 @@ export class ShiftExchangeRequestController {
     @Param('requestId', ParseUUIDPipe) requestId: string,
     @ActiveUserId() userId: string,
   ) {
-    return this.shiftExchangeRequestService.acceptRequest(requestId, userId)
+    return this.shiftExchangeRequestService.acceptRequestByReceptor(
+      requestId,
+      userId,
+    )
   }
 }

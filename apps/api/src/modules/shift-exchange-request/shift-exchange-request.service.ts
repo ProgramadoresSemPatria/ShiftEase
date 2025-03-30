@@ -54,7 +54,10 @@ export class ShiftExchangeRequestService {
     })
   }
 
-  async acceptRequest(shiftExchangeRequestId: string, userId: string) {
+  async acceptRequestByReceptor(
+    shiftExchangeRequestId: string,
+    userId: string,
+  ) {
     const requestExists = await this.shiftExchangeRequestRepo.findUnique({
       where: { id: shiftExchangeRequestId },
     })
