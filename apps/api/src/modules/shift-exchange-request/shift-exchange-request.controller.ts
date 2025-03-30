@@ -39,7 +39,7 @@ export class ShiftExchangeRequestController {
   }
 
   @Patch(':requestId/accept')
-  acceptShiftExchangeRequest(
+  acceptShiftExchangeRequestByReceptor(
     @Param('requestId', ParseUUIDPipe) requestId: string,
     @ActiveUserId() userId: string,
   ) {
