@@ -73,4 +73,24 @@ export class ShiftExchangeRequestService {
       where: { id: shiftExchangeRequestId },
     })
   }
+
+  async rejectRequestByReceptor(
+    shiftExchangeRequestId: string,
+    userId: string,
+  ) {
+    const requestExists = await this.shiftExchangeRequestRepo.findUnique({
+      where: { id: shiftExchangeRequestId },
+    })
+    if (
+      !requestExists ||
+      requestExists.receptor_id !== userId ||
+      requestExists.status !== 'PENDING'
+    )
+      throw new ForbiddenException("Can't reject this request")
+
+    return this.shiftExchangeRequestRepo.update({
+      data: { status: 'REJECTED' },
+      where: { id: shiftExchangeRequestId },
+    })
+  }
 }
