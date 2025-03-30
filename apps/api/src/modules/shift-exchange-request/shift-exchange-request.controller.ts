@@ -8,11 +8,13 @@ import {
   Patch,
   Post,
 } from '@nestjs/common'
+import { ApiBearerAuth } from '@nestjs/swagger'
 import { ActiveUserId } from '@shared/decorators/ActiveUserId'
 import { NecessaryRole } from '@shared/decorators/roles.decorator'
 import { CreateShiftExchangeRequestDto } from './dto/create-shit-exchange-request.dto'
 import { ShiftExchangeRequestService } from './shift-exchange-request.service'
 
+@ApiBearerAuth()
 @Controller('shift-exchange-request')
 export class ShiftExchangeRequestController {
   constructor(

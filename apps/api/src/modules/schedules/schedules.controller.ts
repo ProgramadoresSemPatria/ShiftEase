@@ -11,11 +11,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common'
+import { ApiBearerAuth } from '@nestjs/swagger'
 import { NecessaryRole } from '@shared/decorators/roles.decorator'
 import { CreateScheduleDto } from './dto/create-schedule.dto'
 import { UpdateScheduleDto } from './dto/update-schedule.dto'
 import { SchedulesService } from './schedules.service'
 
+@ApiBearerAuth()
 @Controller('schedules')
 export class SchedulesController {
   constructor(private readonly schedulesService: SchedulesService) {}
