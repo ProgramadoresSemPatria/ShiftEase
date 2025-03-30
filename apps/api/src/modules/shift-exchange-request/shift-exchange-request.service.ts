@@ -83,7 +83,7 @@ export class ShiftExchangeRequestService {
       throw new ForbiddenException("Can't reject this request")
 
     return this.shiftExchangeRequestRepo.update({
-      data: { status: 'REJECTED' },
+      data: { status: 'REJECTED', end_date: new Date() },
       where: { id: shiftExchangeRequestId },
     })
   }
@@ -96,7 +96,7 @@ export class ShiftExchangeRequestService {
       throw new ForbiddenException("Can't approve this request")
 
     return this.shiftExchangeRequestRepo.update({
-      data: { status: 'APPROVED_MANAGER' },
+      data: { status: 'APPROVED_MANAGER', end_date: new Date() },
       where: { id: shiftExchangeRequestId },
     })
   }
@@ -109,7 +109,7 @@ export class ShiftExchangeRequestService {
       throw new ForbiddenException("Can't deny this request")
 
     return this.shiftExchangeRequestRepo.update({
-      data: { status: 'REJECTED' },
+      data: { status: 'REJECTED', end_date: new Date() },
       where: { id: shiftExchangeRequestId },
     })
   }
