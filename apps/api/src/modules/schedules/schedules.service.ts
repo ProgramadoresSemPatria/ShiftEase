@@ -46,6 +46,7 @@ export class SchedulesService {
     if (filters.from || filters.to) {
       where.schedule_shifts = {
         some: {
+          ...where.schedule_shifts.some,
           date: {
             gte: filters.from ? new Date(filters.from) : undefined,
             lte: filters.to ? new Date(filters.to) : undefined,
