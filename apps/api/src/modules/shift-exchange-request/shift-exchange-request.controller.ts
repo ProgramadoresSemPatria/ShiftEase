@@ -1,3 +1,4 @@
+import { Role } from '@modules/users/roles/entities/Role'
 import {
   Body,
   Controller,
@@ -8,6 +9,7 @@ import {
   Post,
 } from '@nestjs/common'
 import { ActiveUserId } from '@shared/decorators/ActiveUserId'
+import { NecessaryRole } from '@shared/decorators/roles.decorator'
 import { CreateShiftExchangeRequestDto } from './dto/create-shit-exchange-request.dto'
 import { ShiftExchangeRequestService } from './shift-exchange-request.service'
 
@@ -52,5 +54,13 @@ export class ShiftExchangeRequestController {
     @ActiveUserId() userId: string,
   ) {
     return this.shiftExchangeRequestService.rejectRequest(requestId, userId)
+  }
+
+  @NecessaryRole(Role.MANAGER, Role.ADMIN)
+  @Patch(':requestId/approve')
+  approveShiftExchangeRequest(
+    @Param('requestId', ParseUUIDPipe) requestId: string,
+  ) {
+    return this.shiftExchangeRequestService.approveRequest(requestId)
   }
 }
