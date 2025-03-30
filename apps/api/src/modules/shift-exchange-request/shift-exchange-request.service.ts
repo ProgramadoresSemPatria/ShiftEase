@@ -40,4 +40,13 @@ export class ShiftExchangeRequestService {
       },
     })
   }
+
+  async count(userId: string) {
+    return this.shiftExchangeRequestRepo.count({
+      where: {
+        OR: [{ applicant_id: userId }, { receptor_id: userId }],
+        status: { in: ['PENDING', 'APPROVED_RECEIVER'] },
+      },
+    })
+  }
 }
