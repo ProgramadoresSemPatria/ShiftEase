@@ -20,7 +20,10 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "style": {}
+      "style": {},
+      "a11y": {
+        "useKeyWithClickEvents": "off"
+      }
     }
   },
   "javascript": {
