@@ -48,4 +48,15 @@ export class ShiftExchangeRequestController {
       userId,
     )
   }
+
+  @Patch(':requestId/reject')
+  rejectShiftExchangeRequestByReceptor(
+    @Param('requestId', ParseUUIDPipe) requestId: string,
+    @ActiveUserId() userId: string,
+  ) {
+    return this.shiftExchangeRequestService.rejectRequestByReceptor(
+      requestId,
+      userId,
+    )
+  }
 }
