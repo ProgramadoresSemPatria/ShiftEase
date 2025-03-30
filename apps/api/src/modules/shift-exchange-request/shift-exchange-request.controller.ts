@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common'
+import { Body, Controller, Get, Post } from '@nestjs/common'
 import { ActiveUserId } from '@shared/decorators/ActiveUserId'
 import { CreateShiftExchangeRequestDto } from './dto/create-shit-exchange-request.dto'
 import { ShiftExchangeRequestService } from './shift-exchange-request.service'
@@ -18,5 +18,10 @@ export class ShiftExchangeRequestController {
       createShiftExchangeRequestDto,
       userId,
     )
+  }
+
+  @Get()
+  getShiftExchangeRequest(@ActiveUserId() userId: string) {
+    return this.shiftExchangeRequestService.findByUser(userId)
   }
 }
