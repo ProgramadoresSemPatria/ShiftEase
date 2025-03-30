@@ -32,4 +32,12 @@ export class ShiftExchangeRequestService {
       },
     })
   }
+
+  async findByUser(userId: string) {
+    return this.shiftExchangeRequestRepo.findMany({
+      where: {
+        OR: [{ applicant_id: userId }, { receptor_id: userId }],
+      },
+    })
+  }
 }
