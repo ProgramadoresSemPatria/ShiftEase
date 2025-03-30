@@ -25,4 +25,8 @@ export class ShiftExchangeRequestRepository {
   delete(deleteDto: Prisma.ShiftExchangeRequestDeleteArgs) {
     return this.prismaService.shiftExchangeRequest.delete(deleteDto)
   }
+
+  count(countDto: Prisma.ShiftExchangeRequestCountArgs) {
+    return this.prismaService.shiftExchangeRequest.count(countDto)
+  }
 }
