@@ -1,5 +1,6 @@
 import { DepartmentsModule } from '@modules/departments/departments.module'
 import { SchedulesModule } from '@modules/schedules/schedules.module'
+import { ShiftExchangeRequestModule } from '@modules/shift-exchange-request/shift-exchange-request.module'
 import { ShiftsModule } from '@modules/shifts/shifts.module'
 import { RoleGuard } from '@modules/users/roles/role.guard'
 import { UsersModule } from '@modules/users/users.module'
@@ -17,6 +18,7 @@ import { AuthModule } from './modules/auth/auth.module'
     DepartmentsModule,
     SchedulesModule,
     ShiftsModule,
+    ShiftExchangeRequestModule,
   ],
   controllers: [],
   providers: [
