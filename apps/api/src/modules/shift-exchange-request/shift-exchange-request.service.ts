@@ -54,10 +54,7 @@ export class ShiftExchangeRequestService {
     })
   }
 
-  async acceptRequestByReceptor(
-    shiftExchangeRequestId: string,
-    userId: string,
-  ) {
+  async acceptRequest(shiftExchangeRequestId: string, userId: string) {
     const requestExists = await this.shiftExchangeRequestRepo.findUnique({
       where: { id: shiftExchangeRequestId },
     })
@@ -74,10 +71,7 @@ export class ShiftExchangeRequestService {
     })
   }
 
-  async rejectRequestByReceptor(
-    shiftExchangeRequestId: string,
-    userId: string,
-  ) {
+  async rejectRequest(shiftExchangeRequestId: string, userId: string) {
     const requestExists = await this.shiftExchangeRequestRepo.findUnique({
       where: { id: shiftExchangeRequestId },
     })

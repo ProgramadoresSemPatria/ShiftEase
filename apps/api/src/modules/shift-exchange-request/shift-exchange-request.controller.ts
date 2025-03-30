@@ -39,24 +39,18 @@ export class ShiftExchangeRequestController {
   }
 
   @Patch(':requestId/accept')
-  acceptShiftExchangeRequestByReceptor(
+  acceptShiftExchangeRequest(
     @Param('requestId', ParseUUIDPipe) requestId: string,
     @ActiveUserId() userId: string,
   ) {
-    return this.shiftExchangeRequestService.acceptRequestByReceptor(
-      requestId,
-      userId,
-    )
+    return this.shiftExchangeRequestService.acceptRequest(requestId, userId)
   }
 
   @Patch(':requestId/reject')
-  rejectShiftExchangeRequestByReceptor(
+  rejectShiftExchangeRequest(
     @Param('requestId', ParseUUIDPipe) requestId: string,
     @ActiveUserId() userId: string,
   ) {
-    return this.shiftExchangeRequestService.rejectRequestByReceptor(
-      requestId,
-      userId,
-    )
+    return this.shiftExchangeRequestService.rejectRequest(requestId, userId)
   }
 }
