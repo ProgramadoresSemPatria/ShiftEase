@@ -8,4 +8,11 @@ export class ScheduleShiftsService {
   async findFirst(id: string) {
     return this.scheduleShiftsRepo.findFirst({ where: { id } })
   }
+
+  async swapScheduleShift(originId: string, destinationId: string) {
+    return this.scheduleShiftsRepo.update({
+      where: { id: originId },
+      data: { shift_id: destinationId },
+    })
+  }
 }
