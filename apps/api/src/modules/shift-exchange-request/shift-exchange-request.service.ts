@@ -87,4 +87,17 @@ export class ShiftExchangeRequestService {
       where: { id: shiftExchangeRequestId },
     })
   }
+
+  async approveRequest(shiftExchangeRequestId: string) {
+    const requestExists = await this.shiftExchangeRequestRepo.findUnique({
+      where: { id: shiftExchangeRequestId },
+    })
+    if (!requestExists || requestExists.status !== 'APPROVED_RECEIVER')
+      throw new ForbiddenException("Can't approve this request")
+
+    return this.shiftExchangeRequestRepo.update({
+      data: { status: 'APPROVED_MANAGER' },
+      where: { id: shiftExchangeRequestId },
+    })
+  }
 }
