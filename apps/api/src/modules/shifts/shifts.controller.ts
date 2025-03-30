@@ -11,11 +11,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common'
+import { ApiBearerAuth } from '@nestjs/swagger'
 import { NecessaryRole } from '@shared/decorators/roles.decorator'
 import { CreateShiftDto } from './dto/create-shift.dto'
 import { UpdateShiftDto } from './dto/update-shift.dto'
 import { ShiftsService } from './services/shifts.service'
 
+@ApiBearerAuth()
 @Controller('shifts')
 export class ShiftsController {
   constructor(private readonly shiftsService: ShiftsService) {}
