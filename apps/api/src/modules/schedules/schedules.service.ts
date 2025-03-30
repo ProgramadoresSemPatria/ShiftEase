@@ -40,7 +40,7 @@ export class SchedulesService {
     }
 
     if (filters.shiftType) {
-      where.schedule_shifts = { some: { shift: { tipo: filters.shiftType } } }
+      where.schedule_shifts = { some: { shift: { type: filters.shiftType } } }
     }
 
     if (filters.from && filters.to) {
