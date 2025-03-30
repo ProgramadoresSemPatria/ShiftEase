@@ -63,4 +63,12 @@ export class ShiftExchangeRequestController {
   ) {
     return this.shiftExchangeRequestService.approveRequest(requestId)
   }
+
+  @NecessaryRole(Role.MANAGER, Role.ADMIN)
+  @Patch(':requestId/deny')
+  denyShiftExchangeRequest(
+    @Param('requestId', ParseUUIDPipe) requestId: string,
+  ) {
+    return this.shiftExchangeRequestService.denyRequest(requestId)
+  }
 }
