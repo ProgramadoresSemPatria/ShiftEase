@@ -1,4 +1,5 @@
 import {
+  Prisma,
   PrismaClient,
   Role,
   ShiftExchangeStatus,
@@ -17,16 +18,11 @@ async function main() {
     return hash(password, 12)
   }
 
+  // 1. Criando dois departamentos
   await prisma.department.createMany({
     data: [
-      {
-        name: 'Tecnologia da Informação',
-        code: 'TI-001',
-      },
-      {
-        name: 'Unidade de Terapia Intensiva',
-        code: 'UTI-001',
-      },
+      { name: 'Tecnologia da Informação', code: 'TI-001' },
+      { name: 'Enfermagem', code: 'ENF-001' },
     ],
     skipDuplicates: true,
   })
@@ -34,17 +30,18 @@ async function main() {
   const tiDepartment = await prisma.department.findUnique({
     where: { code: 'TI-001' },
   })
-  const utiDepartment = await prisma.department.findUnique({
-    where: { code: 'UTI-001' },
+  const enfDepartment = await prisma.department.findUnique({
+    where: { code: 'ENF-001' },
   })
 
-  if (!tiDepartment || !utiDepartment) {
-    throw new Error('Error on department generation')
+  if (!tiDepartment || !enfDepartment) {
+    throw new Error('Erro na geração de departamentos')
   }
 
+  // 2. Criando usuários
   const adminTI = await prisma.user.create({
     data: {
-      name: 'Admin de TI',
+      name: 'Admin TI',
       email: 'admin.ti@hospital.com',
       password: await hashPassword('admin.ti@hospital.com'),
       department_id: tiDepartment.id,
@@ -52,210 +49,139 @@ async function main() {
     },
   })
 
-  await prisma.user.create({
-    data: {
-      name: 'Gestor UTI Diurno',
-      email: 'gestor.uti.diurno@hospital.com',
-      password: await hashPassword('gestor.uti.diurno@hospital.com'),
-      department_id: utiDepartment.id,
-      role: Role.MANAGER,
-    },
-  })
-
-  await prisma.user.create({
-    data: {
-      name: 'Gestor UTI Noturno',
-      email: 'gestor.uti.noturno@hospital.com',
-      password: await hashPassword('gestor.uti.noturno@hospital.com'),
-      department_id: utiDepartment.id,
-      role: Role.MANAGER,
-    },
-  })
-
-  const funcionariosUTI = await Promise.all([
+  const gestores = await Promise.all([
     prisma.user.create({
       data: {
-        name: 'Enfermeiro UTI 1',
-        email: 'enfermeiro1.uti@hospital.com',
-        password: await hashPassword('enfermeiro1.uti@hospital.com'),
-        department_id: utiDepartment.id,
-        role: Role.USER,
+        name: 'Gestor Enf Diurno',
+        email: 'gestor.enf.diurno@hospital.com',
+        password: await hashPassword('gestor.enf.diurno@hospital.com'),
+        department_id: enfDepartment.id,
+        role: Role.MANAGER,
       },
     }),
     prisma.user.create({
       data: {
-        name: 'Enfermeiro UTI 2',
-        email: 'enfermeiro2.uti@hospital.com',
-        password: await hashPassword('enfermeiro2.uti@hospital.com'),
-        department_id: utiDepartment.id,
-        role: Role.USER,
-      },
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Enfermeiro UTI 3',
-        email: 'enfermeiro3.uti@hospital.com',
-        password: await hashPassword('enfermeiro3.uti@hospital.com'),
-        department_id: utiDepartment.id,
-        role: Role.USER,
-      },
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Enfermeiro UTI 4',
-        email: 'enfermeiro4.uti@hospital.com',
-        password: await hashPassword('enfermeiro4.uti@hospital.com'),
-        department_id: utiDepartment.id,
-        role: Role.USER,
-      },
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Enfermeiro UTI 5',
-        email: 'enfermeiro5.uti@hospital.com',
-        password: await hashPassword('enfermeiro5.uti@hospital.com'),
-        department_id: utiDepartment.id,
-        role: Role.USER,
-      },
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Enfermeiro UTI 6',
-        email: 'enfermeiro6.uti@hospital.com',
-        password: await hashPassword('enfermeiro6.uti@hospital.com'),
-        department_id: utiDepartment.id,
-        role: Role.USER,
+        name: 'Gestor Enf Noturno',
+        email: 'gestor.enf.noturno@hospital.com',
+        password: await hashPassword('gestor.enf.noturno@hospital.com'),
+        department_id: enfDepartment.id,
+        role: Role.MANAGER,
       },
     }),
   ])
 
-  const tiShift = await prisma.shift.create({
-    data: {
-      department_id: tiDepartment.id,
-      type: ShiftType.DIURNAL,
-    },
-  })
+  const enfermeiros = await Promise.all(
+    Array.from({ length: 18 }, async (_, i) => {
+      const isDiurno = i < 9 // 9 diurnos, 9 noturnos
+      return prisma.user.create({
+        data: {
+          name: `Enfermeiro ${i + 1} ${isDiurno ? 'Diurno' : 'Noturno'}`,
+          email: `enf${i + 1}.${isDiurno ? 'diurno' : 'noturno'}@hospital.com`,
+          password: await hashPassword(
+            `enf${i + 1}.${isDiurno ? 'diurno' : 'noturno'}@hospital.com`,
+          ),
+          department_id: enfDepartment.id,
+          role: Role.USER,
+        },
+      })
+    }),
+  )
 
-  const utiDiurnoShift = await prisma.shift.create({
-    data: {
-      department_id: utiDepartment.id,
-      type: ShiftType.DIURNAL,
-    },
-  })
+  // Criando turnos
+  const shifts = await Promise.all([
+    prisma.shift.create({
+      data: { department_id: tiDepartment.id, type: ShiftType.DIURNAL },
+    }),
+    prisma.shift.create({
+      data: { department_id: enfDepartment.id, type: ShiftType.DIURNAL },
+    }),
+    prisma.shift.create({
+      data: { department_id: enfDepartment.id, type: ShiftType.NOCTURNAL },
+    }),
+  ])
 
-  const utiNoturnoShift = await prisma.shift.create({
-    data: {
-      department_id: utiDepartment.id,
-      type: ShiftType.NOCTURNAL,
-    },
-  })
+  const tiShift = shifts[0]
+  const enfDiurnoShift = shifts[1]
+  const enfNoturnoShift = shifts[2]
 
-  const adminSchedule = await prisma.schedule.create({
-    data: {
-      user_id: adminTI.id,
-      name: 'Escala Admin TI',
-      start_date: new Date('2024-01-01'),
-      end_date: new Date('2024-12-31'),
-    },
-  })
+  // 3. Criando escalas mensais com 12x36 para março de 2025
+  const schedules = await Promise.all(
+    [adminTI, ...enfermeiros].map(async (user, index) => {
+      const isTI = user.department_id === tiDepartment.id
+      const isDiurno = index <= 9 // Admin + 9 diurnos
+      const shift = isTI ? tiShift : isDiurno ? enfDiurnoShift : enfNoturnoShift
 
-  await prisma.scheduleShift.createMany({
-    data: [
-      {
-        schedule_id: adminSchedule.id,
-        shift_id: tiShift.id,
-        day_week: WeekDay.MONDAY,
-        date: new Date('2024-03-25'),
-      },
-      {
-        schedule_id: adminSchedule.id,
-        shift_id: tiShift.id,
-        day_week: WeekDay.TUESDAY,
-        date: new Date('2024-03-26'),
-      },
-      {
-        schedule_id: adminSchedule.id,
-        shift_id: tiShift.id,
-        day_week: WeekDay.WEDNESDAY,
-        date: new Date('2024-03-27'),
-      },
-      {
-        schedule_id: adminSchedule.id,
-        shift_id: tiShift.id,
-        day_week: WeekDay.THURSDAY,
-        date: new Date('2024-03-28'),
-      },
-      {
-        schedule_id: adminSchedule.id,
-        shift_id: tiShift.id,
-        day_week: WeekDay.FRIDAY,
-        date: new Date('2024-03-29'),
-      },
-    ],
-  })
-
-  await Promise.all(
-    funcionariosUTI.map(async (funcionario, index) => {
       const schedule = await prisma.schedule.create({
         data: {
-          user_id: funcionario.id,
-          name: `Escala UTI ${funcionario.name}`,
-          start_date: new Date('2024-01-01'),
-          end_date: new Date('2024-12-31'),
+          user_id: user.id,
+          name: `Escala ${user.name} - Março 2025`,
+          start_date: new Date('2025-03-01'),
+          end_date: new Date('2025-03-31'),
         },
       })
 
-      const workDays = [
-        [WeekDay.MONDAY, WeekDay.WEDNESDAY],
-        [WeekDay.TUESDAY, WeekDay.THURSDAY],
-        [WeekDay.WEDNESDAY, WeekDay.FRIDAY],
+      // Escala 12x36: trabalho dia sim, dois dias não (aproximadamente)
+      const scheduleShifts: Prisma.ScheduleShiftCreateManyInput[] = []
+      let date = new Date('2025-03-01')
+      const weekDays = [
+        WeekDay.SUNDAY,
+        WeekDay.MONDAY,
+        WeekDay.TUESDAY,
+        WeekDay.WEDNESDAY,
+        WeekDay.THURSDAY,
+        WeekDay.FRIDAY,
+        WeekDay.SATURDAY,
       ]
 
-      const selectedShift = index < 3 ? utiDiurnoShift : utiNoturnoShift
-      const selectedWorkDays = workDays[index % 3]
+      while (date <= new Date('2025-03-31')) {
+        scheduleShifts.push({
+          schedule_id: schedule.id,
+          shift_id: shift.id,
+          day_week: weekDays[date.getDay()],
+          date: new Date(date),
+        })
+        date.setDate(date.getDate() + 3) // 12h trabalho, 36h folga
+      }
 
-      await prisma.scheduleShift.createMany({
-        data: selectedWorkDays.map((day) => {
-          const dayMap = {
-            MONDAY: 25,
-            TUESDAY: 26,
-            WEDNESDAY: 27,
-            THURSDAY: 28,
-            FRIDAY: 29,
-          }
-
-          return {
-            schedule_id: schedule.id,
-            shift_id: selectedShift.id,
-            day_week: day,
-            date: new Date(`2024-03-${dayMap[day]}`),
-          }
-        }),
-      })
-
+      await prisma.scheduleShift.createMany({ data: scheduleShifts })
       return schedule
     }),
   )
 
+  // Pegando todos os ScheduleShifts para usar nas trocas
+  const allScheduleShifts = await prisma.scheduleShift.findMany({
+    where: { shift_id: { in: [enfDiurnoShift.id, enfNoturnoShift.id] } },
+  })
+
+  // 4. Simulando trocas de turno entre enfermeiros
   await prisma.shiftExchangeRequest.createMany({
     data: [
       {
-        applicant_id: funcionariosUTI[0].id,
-        receptor_id: funcionariosUTI[1].id,
-        department_id: utiDepartment.id,
+        applicant_id: enfermeiros[0].id, // Enfermeiro 1 Diurno
+        receptor_id: enfermeiros[1].id, // Enfermeiro 2 Diurno
+        department_id: enfDepartment.id,
         status: ShiftExchangeStatus.PENDING,
-        origin_shift_id: utiDiurnoShift.id,
-        destination_id: utiNoturnoShift.id,
-        reason: 'Necessidade de ajuste na escala',
+        origin_shift_id: allScheduleShifts[0].id,
+        destination_id: allScheduleShifts[1].id,
+        reason: 'Conflito de horário',
       },
       {
-        applicant_id: funcionariosUTI[3].id,
-        receptor_id: funcionariosUTI[4].id,
-        department_id: utiDepartment.id,
-        status: ShiftExchangeStatus.PENDING,
-        origin_shift_id: utiNoturnoShift.id,
-        destination_id: utiDiurnoShift.id,
-        reason: 'Compromisso pessoal',
+        applicant_id: enfermeiros[9].id, // Enfermeiro 1 Noturno
+        receptor_id: enfermeiros[10].id, // Enfermeiro 2 Noturno
+        department_id: enfDepartment.id,
+        status: ShiftExchangeStatus.APPROVED_RECEIVER,
+        origin_shift_id: allScheduleShifts[10].id,
+        destination_id: allScheduleShifts[11].id,
+        reason: 'Preferência por outro dia',
+      },
+      {
+        applicant_id: enfermeiros[2].id, // Enfermeiro 3 Diurno
+        receptor_id: enfermeiros[11].id, // Enfermeiro 3 Noturno
+        department_id: enfDepartment.id,
+        status: ShiftExchangeStatus.APPROVED_MANAGER,
+        origin_shift_id: allScheduleShifts[2].id,
+        destination_id: allScheduleShifts[12].id,
+        reason: 'Ajuste de escala',
       },
     ],
   })
