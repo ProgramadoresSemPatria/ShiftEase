@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+} from '@nestjs/common'
 import { ActiveUserId } from '@shared/decorators/ActiveUserId'
 import { CreateShiftExchangeRequestDto } from './dto/create-shit-exchange-request.dto'
 import { ShiftExchangeRequestService } from './shift-exchange-request.service'
@@ -28,5 +36,13 @@ export class ShiftExchangeRequestController {
   @Get('count')
   count(@ActiveUserId() userId: string) {
     return this.shiftExchangeRequestService.count(userId)
+  }
+
+  @Patch(':requestId/accept')
+  acceptShiftExchangeRequest(
+    @Param('requestId', ParseUUIDPipe) requestId: string,
+    @ActiveUserId() userId: string,
+  ) {
+    return this.shiftExchangeRequestService.acceptRequest(requestId, userId)
   }
 }
