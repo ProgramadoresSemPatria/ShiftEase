@@ -24,4 +24,9 @@ export class ShiftExchangeRequestController {
   getShiftExchangeRequest(@ActiveUserId() userId: string) {
     return this.shiftExchangeRequestService.findByUser(userId)
   }
+
+  @Get('count')
+  count(@ActiveUserId() userId: string) {
+    return this.shiftExchangeRequestService.count(userId)
+  }
 }
