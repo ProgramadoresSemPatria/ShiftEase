@@ -43,18 +43,32 @@ export class SchedulesService {
       where.schedule_shifts = { some: { shift: { type: filters.shiftType } } }
     }
 
-    if (filters.from && filters.to) {
-      where.start_date = { gte: new Date(filters.from) }
-      where.end_date = { lte: new Date(filters.to) }
-    } else if (filters.from) {
-      where.start_date = { gte: new Date(filters.from) }
-    } else if (filters.to) {
-      where.end_date = { lte: new Date(filters.to) }
+    if (filters.from || filters.to) {
+      where.schedule_shifts = {
+        some: {
+          date: {
+            gte: filters.from ? new Date(filters.from) : undefined,
+            lte: filters.to ? new Date(filters.to) : undefined,
+          },
+        },
+      }
     }
 
     return this.schedulesRepo.findMany({
       where,
-      include: { schedule_shifts: true },
+      include: {
+        schedule_shifts: {
+          where: {
+            date: {
+              gte: filters.from ? new Date(filters.from) : undefined,
+              lte: filters.to ? new Date(filters.to) : undefined,
+            },
+          },
+          include: {
+            shift: true,
+          },
+        },
+      },
     })
   }
 
