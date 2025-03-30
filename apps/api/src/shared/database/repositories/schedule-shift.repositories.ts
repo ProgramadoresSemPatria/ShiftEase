@@ -10,6 +10,10 @@ export class ScheduleShiftRepository {
     return this.prismaService.scheduleShift.findFirst(findFirstDto)
   }
 
+  findUnique(findUniqueDto: Prisma.ScheduleShiftFindUniqueArgs) {
+    return this.prismaService.scheduleShift.findUnique(findUniqueDto)
+  }
+
   update(updateDto: Prisma.ScheduleShiftUpdateArgs) {
     return this.prismaService.scheduleShift.update(updateDto)
   }
