@@ -12,7 +12,7 @@ export interface User {
 	role: Role;
 
 	department: Department;
-	schedules: Schedule;
+	schedules: Schedule[];
 	requests_sent: ShiftExchangeRequest[];
 	requests_received: ShiftExchangeRequest[];
 }
