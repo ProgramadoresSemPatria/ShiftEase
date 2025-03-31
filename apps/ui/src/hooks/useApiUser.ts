@@ -1,8 +1,11 @@
 import { api } from "@/services/api";
+import type { Role } from "@/types/enums";
 
 type UserResponse = {
+	id: string;
 	email: string;
 	name: string;
+	role: Role;
 };
 
 export const useApiUser = () => ({
