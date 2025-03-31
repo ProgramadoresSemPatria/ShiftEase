@@ -17,12 +17,13 @@ export const useApiSchedules = () => ({
 		shiftType,
 		from,
 		to,
-	}: QueryParams): Promise<Schedule | null> => {
+	}: QueryParams): Promise<Schedule[] | null> => {
 		try {
 			const response = await api.get("/schedules", {
 				params: { search, departmentId, shiftType, from, to },
 			});
-			return response.data;
+			const data = response.data;
+			return Array.isArray(data) ? data : [data];
 		} catch (error) {
 			console.error(error);
 			return null;
