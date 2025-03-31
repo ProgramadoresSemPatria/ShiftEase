@@ -1,8 +1,11 @@
+import type { Role } from "@/types/enums";
 import { createContext } from "react";
 
 export type contextUser = {
+	id: string;
 	email: string;
 	name: string;
+	role: Role;
 };
 
 export type AuthContextType = {
