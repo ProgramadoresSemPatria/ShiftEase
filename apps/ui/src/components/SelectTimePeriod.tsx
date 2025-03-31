@@ -9,12 +9,19 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import React from "react";
 
-export default function SelectTimePeriod() {
-	const [dateFrom, setDateFrom] = React.useState<Date>();
-	const [dateTo, setDateTo] = React.useState<Date>();
-
+type Props = {
+	dateFrom: Date | undefined;
+	setDateFrom: React.Dispatch<React.SetStateAction<Date | undefined>>;
+	dateTo: Date | undefined;
+	setDateTo: React.Dispatch<React.SetStateAction<Date | undefined>>;
+};
+export default function SelectTimePeriod({
+	dateFrom,
+	setDateFrom,
+	dateTo,
+	setDateTo,
+}: Props) {
 	return (
 		<div className="flex flex-col md:flex-row gap-3 md:items-end">
 			<div className="flex flex-col">
