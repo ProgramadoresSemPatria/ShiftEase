@@ -9,11 +9,10 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { AuthContext } from "@/contexts/auth/AuthContext";
-import { useShiftExchangeRequest } from "@/hooks/useShiftExchangeRequest";
 import type { getUserSwapRequestsResponse } from "@/hooks/useShiftExchangeRequest";
+import { useShiftExchangeRequest } from "@/hooks/useShiftExchangeRequest";
 import { Role, ShiftExchangeStatus } from "@/types/enums";
 import { formatDayAndDate } from "@/utils/formatDayAndDate";
-// components/SwapRequestTab.tsx
 import { useContext, useEffect, useState } from "react";
 
 const getStatusBadgeClass = (status: ShiftExchangeStatus): string => {
@@ -36,9 +35,9 @@ const getStatusText = (status: ShiftExchangeStatus): string => {
 		case ShiftExchangeStatus.PENDING:
 			return "Pending";
 		case ShiftExchangeStatus.APPROVED_RECEIVER:
-			return "Approved by receiver";
+			return "Accept by receiver";
 		case ShiftExchangeStatus.APPROVED_MANAGER:
-			return "Approved by manager";
+			return "Approved";
 		case ShiftExchangeStatus.REJECTED:
 			return "Rejected";
 		default:
@@ -65,6 +64,7 @@ export default function SwapRequestTab() {
 			setLoading(true);
 			try {
 				const response = await getUserSwapRequests();
+				console.log(response);
 				if (response && Array.isArray(response)) {
 					setSwapRequests(response);
 				} else if (response) {
@@ -166,10 +166,10 @@ export default function SwapRequestTab() {
 								return (
 									<TableRow key={request.id}>
 										<TableCell className="font-medium text-left">
-											{isFromUser ? "You" : "Unknown"}
+											{isFromUser ? "You" : request.applicant.name}
 										</TableCell>
 										<TableCell className="font-medium">
-											{isToUser ? "You" : "Unknown"}
+											{isToUser ? "You" : request.receptor.name}
 										</TableCell>
 										<TableCell className="font-medium">
 											<div className="items-center gap-1 font-bold">
