@@ -1,5 +1,6 @@
 import { api } from "@/services/api";
 import type { ShiftExchangeStatus, WeekDay } from "@/types/enums";
+import type { User } from "@/types/user";
 
 export type ScheduleShift = {
 	id: string;
@@ -22,6 +23,8 @@ export type getUserSwapRequestsResponse = {
 	reason: string;
 	origin_shift: ScheduleShift;
 	destination_shift: ScheduleShift;
+	applicant: User;
+	receptor: User;
 };
 
 export type CreateShiftExchangeRequestDto = {
