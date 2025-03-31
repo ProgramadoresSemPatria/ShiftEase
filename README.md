@@ -33,19 +33,15 @@ Configurar variáveis de ambiente de acordo com os arquivos .env.example
 🔧 Passos para execução:
 
 Acesse a pasta APPS/API e execute o comando para subir o banco no container Docker:
-
 ```yarn db:run```
 
 Rode as migrações do Prisma:
-
 ```yarn prisma migrate dev```  
 
 Execute a seed do banco de dados:
-
 ```yarn db:seed``` 
 
 Para iniciar o projeto, execute o comando na pasta raiz:
-
 ```yarn dev```
 
 ✒️ Autores:
