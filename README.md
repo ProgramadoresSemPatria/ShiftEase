@@ -1,51 +1,51 @@
 ShiftEASE
 
-Este projeto é um Software as a Service (SAAS) desenvolvido para empresas que operam em regime de plantões e turnos. A plataforma permite que os usuários tenham uma visão geral das escalas e que possam acessar suas próprias escalas individuais, de forma intuitiva e organizada.
+This project is a Software as a Service (SAAS) developed for companies operating in shift-based and on-call work environments. The platform provides users with an overview of schedules and allows them to access their individual shifts in an intuitive and organized way.
 
-🚀 Funcionalidades:
+🚀 Features:
 
-Painel do Funcionário: Exibição personalizada da escala individual.
+Employee Dashboard: Personalized display of individual schedules.
 
-Solicitação de Trocas de Turnos: Funcionários podem solicitar trocas de turnos.
+Shift Swap Requests: Employees can request shift exchanges.
 
-Gerenciamento de Escalas: Criar, editar e visualizar turnos e escalas.
+Schedule Management: Create, edit, and view shifts and schedules.
 
-Gestão de Departamentos: Estruturação da empresa por setores.
+Department Management: Organize the company by departments.
 
-Autenticação Robusta: Implementação de autenticação segura com tokens JWT.
+Robust Authentication: Secure authentication using JWT tokens.
 
-🛠️ Tecnologias Utilizadas:
+🛠️ Technologies Used:
 
 Back-end: Node.js, Nest, PostgreSQL
 
 Front-end: React.js, Vite
 
-⚡ Pré-requisitos:
+⚡ Prerequisites:
 
-NVM e Node.js (versão 20.11)
+NVM and Node.js (version 20.11)
 
-Yarn instalado
+Yarn installed
 
-Docker Compose instalado
+Docker Compose installed
 
-Configurar variáveis de ambiente de acordo com os arquivos .env.example
+Configure environment variables according to the .env.example files
 
-🔧 Passos para execução:
+🔧 Execution Steps:
 
-Acesse a pasta APPS/API e execute o comando para subir o banco no container Docker:
+Navigate to the APPS/API folder and run the command to start the database in a Docker container:
 ```yarn db:run```
 
-Rode as migrações do Prisma:
+Run Prisma migrations:
 ```yarn prisma migrate dev```  
 
-Execute a seed do banco de dados:
+Seed the database:
 ```yarn db:seed``` 
 
-Para iniciar o projeto, execute o comando na pasta raiz:
+To start the project, run the following command in the root folder:
 ```yarn dev```
 
-✒️ Autores:
+✒️ Authors:
 
- [Lucas Franco](https://github.com/lcs-franco)  
  [Pablo Matheus](https://github.com/itspablomontes)  
+ [Lucas Franco](https://github.com/lcs-franco)  
  [Lucas Donato](https://github.com/LGDonato)  
