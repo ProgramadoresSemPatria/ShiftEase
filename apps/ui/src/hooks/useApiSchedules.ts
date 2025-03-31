@@ -3,11 +3,11 @@ import type { ShiftType } from "@/types/enums";
 import type { Schedule } from "@/types/schedule";
 
 export type QueryParams = {
-	search: string;
+	search?: string;
 	departmentId: string;
-	shiftType: ShiftType;
-	from: string;
-	to: string;
+	shiftType?: ShiftType;
+	from?: string;
+	to?: string;
 };
 
 export const useApiSchedules = () => ({
