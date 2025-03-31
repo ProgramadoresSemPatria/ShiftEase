@@ -9,14 +9,23 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import type { ScheduleShift } from "@/types/schedule";
 import SelectExchangeShift from "./SelectExchangeShift";
 
 type Props = {
 	name: string;
 	schedule: string;
+	day: string;
+	shiftId?: string;
+	loggedUserShifts: ScheduleShift[];
 };
 
-export default function RequestSwapDialog({ name, schedule }: Props) {
+export default function RequestSwapDialog({
+	name,
+	schedule,
+	day,
+	loggedUserShifts,
+}: Props) {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -30,15 +39,14 @@ export default function RequestSwapDialog({ name, schedule }: Props) {
 					<DialogDescription className="flex flex-col gap-3">
 						<div>
 							<div className="text-lg">{name}'s Shift</div>
-							<div className="flex border-1 px-2 py-5 justify-between rounded-md font-bold items-center  text-lg">
-								<div className="text-black">Wed 26</div>
+							<div className="flex border-1 px-2 py-5 justify-between rounded-md font-bold items-center text-lg">
+								<div className="text-black">{day}</div>
 								<div className="text-green-900">{schedule}</div>
 							</div>
 						</div>
 						<div>
-							<div className="text-lg">Select your shift to offer:</div>
-
-							<SelectExchangeShift day="Wed 26" schedule={schedule} />
+							<div className="text-lg">Selecione seu turno para oferecer:</div>
+							<SelectExchangeShift shifts={loggedUserShifts} />
 						</div>
 					</DialogDescription>
 				</DialogHeader>
