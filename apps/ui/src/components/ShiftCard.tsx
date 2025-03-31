@@ -1,4 +1,5 @@
 import { AuthContext } from "@/contexts/auth/AuthContext";
+import type { ScheduleShift } from "@/types/schedule";
 import { useContext } from "react";
 import RequestSwapDialog from "./RequestSwapDialog";
 
@@ -6,16 +7,32 @@ type Props = {
 	name: string;
 	schedule: string;
 	isSwapable: boolean;
+	day: string;
+	shiftId?: string;
+	loggedUserShifts: ScheduleShift[];
 };
 
-export default function ShiftCard({ name, schedule, isSwapable }: Props) {
+export default function ShiftCard({
+	name,
+	schedule,
+	isSwapable,
+	day,
+	shiftId,
+	loggedUserShifts,
+}: Props) {
 	const auth = useContext(AuthContext);
-	console.log(isSwapable);
+
 	return (
 		<div className="flex flex-col justify-center bg-green-300 text-green-950 p-4 rounded-md font-bold items-center gap-2">
 			<div className="text-lg">{schedule}</div>
 			{auth.user?.name !== name && isSwapable && (
-				<RequestSwapDialog name={name} schedule={schedule} />
+				<RequestSwapDialog
+					name={name}
+					schedule={schedule}
+					day={day}
+					shiftId={shiftId}
+					loggedUserShifts={loggedUserShifts}
+				/>
 			)}
 		</div>
 	);
