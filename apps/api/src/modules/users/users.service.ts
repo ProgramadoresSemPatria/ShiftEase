@@ -14,6 +14,7 @@ export class UsersService {
         name: true,
         email: true,
         role: true,
+        department_id: true,
       },
     })
   }
@@ -21,25 +22,9 @@ export class UsersService {
   async findUserSchedules(userId: string) {
     return this.usersRepo.findUnique({
       where: { id: userId },
-      select: {
-        schedules: {
-          select: {
-            name: true,
-            start_date: true,
-            end_date: true,
-            schedule_shifts: {
-              select: {
-                day_week: true,
-                date: true,
-                shift: {
-                  select: {
-                    type: true,
-                  },
-                },
-              },
-            },
-          },
-        },
+      omit: { password: true },
+      include: {
+        schedules: { include: { schedule_shifts: true } },
       },
     })
   }
