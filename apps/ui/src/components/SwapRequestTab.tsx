@@ -64,7 +64,6 @@ export default function SwapRequestTab() {
 			setLoading(true);
 			try {
 				const response = await getUserSwapRequests();
-				console.log(response);
 				if (response && Array.isArray(response)) {
 					setSwapRequests(response);
 				} else if (response) {
