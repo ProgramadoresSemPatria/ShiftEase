@@ -47,6 +47,8 @@ export class ShiftExchangeRequestService {
       include: {
         origin_shift: true,
         destination_shift: true,
+        applicant: true,
+        receptor: true,
       },
     })
   }
