@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "start": "node apps/api/dist/main",
+    "start": "node apps/api/dist/src/main",
     "prepare": "husky install"
   },
   "packageManager": "yarn@1.22.22",
