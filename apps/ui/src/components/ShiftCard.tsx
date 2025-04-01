@@ -9,6 +9,7 @@ type Props = {
 	isSwapable: boolean;
 	day: string;
 	shiftId?: string;
+	userId: string;
 	loggedUserShifts: ScheduleShift[];
 };
 
@@ -18,6 +19,7 @@ export default function ShiftCard({
 	isSwapable,
 	day,
 	shiftId,
+	userId,
 	loggedUserShifts,
 }: Props) {
 	const auth = useContext(AuthContext);
@@ -30,7 +32,8 @@ export default function ShiftCard({
 					name={name}
 					schedule={schedule}
 					day={day}
-					shiftId={shiftId}
+					receptorId={userId}
+					destinationId={shiftId}
 					loggedUserShifts={loggedUserShifts}
 				/>
 			)}
