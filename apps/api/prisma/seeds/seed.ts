@@ -104,7 +104,14 @@ async function main() {
   const enfDiurnoShift = shifts[1]
   const enfNoturnoShift = shifts[2]
 
-  // 3. Criando escalas mensais com 12x36 para março de 2025
+  // Função para adicionar dias a uma data
+  function addDays(date, days) {
+    const newDate = new Date(date)
+    newDate.setDate(newDate.getDate() + days)
+    return newDate
+  }
+
+  // 3. Criando escalas mensais com 12x36 para abril de 2025
   const schedules = await Promise.all(
     [adminTI, ...enfermeiros].map(async (user, index) => {
       const isTI = user.department_id === tiDepartment.id
@@ -114,15 +121,12 @@ async function main() {
       const schedule = await prisma.schedule.create({
         data: {
           user_id: user.id,
-          name: `Escala ${user.name} - Março 2025`,
-          start_date: new Date('2025-03-01'),
-          end_date: new Date('2025-03-31'),
+          name: `Escala ${user.name} - Abril 2025`,
+          start_date: new Date('2025-04-01'),
+          end_date: new Date('2025-04-30'),
         },
       })
 
-      // Escala 12x36: trabalho dia sim, dois dias não (aproximadamente)
-      const scheduleShifts: Prisma.ScheduleShiftCreateManyInput[] = []
-      let date = new Date('2025-03-01')
       const weekDays = [
         WeekDay.SUNDAY,
         WeekDay.MONDAY,
@@ -133,14 +137,40 @@ async function main() {
         WeekDay.SATURDAY,
       ]
 
-      while (date <= new Date('2025-03-31')) {
-        scheduleShifts.push({
-          schedule_id: schedule.id,
-          shift_id: shift.id,
-          day_week: weekDays[date.getDay()],
-          date: new Date(date),
-        })
-        date.setDate(date.getDate() + 3) // 12h trabalho, 36h folga
+      const scheduleShifts: Prisma.ScheduleShiftCreateManyInput[] = []
+      let startDate = new Date('2025-04-01') // Terça-feira
+
+      if (isTI) {
+        // Escala para Admin TI (mantida como estava)
+        let date = startDate
+        while (date <= new Date('2025-04-30')) {
+          scheduleShifts.push({
+            schedule_id: schedule.id,
+            shift_id: shift.id,
+            day_week: weekDays[date.getDay()],
+            date: new Date(date),
+          })
+          date = addDays(date, 3) // 12h trabalho, 36h folga
+        }
+      } else {
+        // Escala para enfermeiros com grupos alternados
+        const enfIndex = index - 1 // Subtrai 1 por causa do adminTI no índice 0
+        const groupIndex = isDiurno
+          ? Math.floor(enfIndex / 3) // Grupos 0, 1, 2 para diurnos
+          : Math.floor((enfIndex - 9) / 3) // Grupos 0, 1, 2 para noturnos
+        const startOffset = groupIndex // 0, 1 ou 2 dias de offset
+        startDate = addDays(startDate, startOffset)
+
+        let date = startDate
+        while (date <= new Date('2025-04-30')) {
+          scheduleShifts.push({
+            schedule_id: schedule.id,
+            shift_id: shift.id,
+            day_week: weekDays[date.getDay()],
+            date: new Date(date),
+          })
+          date = addDays(date, 3) // 12h trabalho, 36h folga
+        }
       }
 
       await prisma.scheduleShift.createMany({ data: scheduleShifts })
@@ -148,40 +178,62 @@ async function main() {
     }),
   )
 
-  // Pegando todos os ScheduleShifts para usar nas trocas
-  const allScheduleShifts = await prisma.scheduleShift.findMany({
-    where: { shift_id: { in: [enfDiurnoShift.id, enfNoturnoShift.id] } },
+  // Pegando todos os ScheduleShifts para o turno diurno
+  const allScheduleShiftsDiurno = await prisma.scheduleShift.findMany({
+    where: { shift_id: enfDiurnoShift.id },
   })
 
-  // 4. Simulando trocas de turno entre enfermeiros
   await prisma.shiftExchangeRequest.createMany({
     data: [
+      // 1. Solicitação Pendente: Enfermeiro 1 Diurno solicita troca com Enfermeiro 2 Diurno
       {
         applicant_id: enfermeiros[0].id, // Enfermeiro 1 Diurno
         receptor_id: enfermeiros[1].id, // Enfermeiro 2 Diurno
         department_id: enfDepartment.id,
         status: ShiftExchangeStatus.PENDING,
-        origin_shift_id: allScheduleShifts[0].id,
-        destination_id: allScheduleShifts[1].id,
+        origin_shift_id: allScheduleShiftsDiurno[0].id, // Turno do Enfermeiro 1
+        destination_id: allScheduleShiftsDiurno[1].id, // Turno do Enfermeiro 2
         reason: 'Conflito de horário',
       },
-      {
-        applicant_id: enfermeiros[9].id, // Enfermeiro 1 Noturno
-        receptor_id: enfermeiros[10].id, // Enfermeiro 2 Noturno
-        department_id: enfDepartment.id,
-        status: ShiftExchangeStatus.APPROVED_RECEIVER,
-        origin_shift_id: allScheduleShifts[10].id,
-        destination_id: allScheduleShifts[11].id,
-        reason: 'Preferência por outro dia',
-      },
+      // 2. Solicitação Aprovada pelo Receptor: Enfermeiro 3 Diurno solicita troca com Enfermeiro 1 Diurno
       {
         applicant_id: enfermeiros[2].id, // Enfermeiro 3 Diurno
-        receptor_id: enfermeiros[11].id, // Enfermeiro 3 Noturno
+        receptor_id: enfermeiros[0].id, // Enfermeiro 1 Diurno
+        department_id: enfDepartment.id,
+        status: ShiftExchangeStatus.APPROVED_RECEIVER,
+        origin_shift_id: allScheduleShiftsDiurno[2].id, // Turno do Enfermeiro 3
+        destination_id: allScheduleShiftsDiurno[0].id, // Turno do Enfermeiro 1
+        reason: 'Preferência por outro dia',
+      },
+      // 3. Solicitação Aprovada pelo Gestor: Enfermeiro 1 Diurno solicita troca com Enfermeiro 4 Diurno
+      {
+        applicant_id: enfermeiros[0].id, // Enfermeiro 1 Diurno
+        receptor_id: enfermeiros[3].id, // Enfermeiro 4 Diurno
         department_id: enfDepartment.id,
         status: ShiftExchangeStatus.APPROVED_MANAGER,
-        origin_shift_id: allScheduleShifts[2].id,
-        destination_id: allScheduleShifts[12].id,
+        origin_shift_id: allScheduleShiftsDiurno[0].id, // Turno do Enfermeiro 1
+        destination_id: allScheduleShiftsDiurno[3].id, // Turno do Enfermeiro 4
         reason: 'Ajuste de escala',
+      },
+      // 4. Solicitação Rejeitada pelo Receptor: Enfermeiro 1 Diurno solicita troca com Enfermeiro 5 Diurno
+      {
+        applicant_id: enfermeiros[0].id, // Enfermeiro 1 Diurno
+        receptor_id: enfermeiros[4].id, // Enfermeiro 5 Diurno
+        department_id: enfDepartment.id,
+        status: ShiftExchangeStatus.REJECTED,
+        origin_shift_id: allScheduleShiftsDiurno[0].id, // Turno do Enfermeiro 1
+        destination_id: allScheduleShiftsDiurno[4].id, // Turno do Enfermeiro 5
+        reason: 'Motivo pessoal',
+      },
+      // 5. Solicitação Rejeitada pelo Gestor: Enfermeiro 6 Diurno solicita troca com Enfermeiro 1 Diurno
+      {
+        applicant_id: enfermeiros[5].id, // Enfermeiro 6 Diurno
+        receptor_id: enfermeiros[0].id, // Enfermeiro 1 Diurno
+        department_id: enfDepartment.id,
+        status: ShiftExchangeStatus.PENDING,
+        origin_shift_id: allScheduleShiftsDiurno[5].id, // Turno do Enfermeiro 6
+        destination_id: allScheduleShiftsDiurno[0].id, // Turno do Enfermeiro 1
+        reason: 'Necessidade de cobertura',
       },
     ],
   })
