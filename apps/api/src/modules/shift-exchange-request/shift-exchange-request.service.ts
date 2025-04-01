@@ -44,6 +44,12 @@ export class ShiftExchangeRequestService {
       where: {
         OR: [{ applicant_id: userId }, { receptor_id: userId }],
       },
+      include: {
+        origin_shift: true,
+        destination_shift: true,
+        applicant: true,
+        receptor: true,
+      },
     })
   }
 
@@ -67,8 +73,29 @@ export class ShiftExchangeRequestService {
     )
       throw new ForbiddenException("Can't accept this request")
 
+    const originScheduleShift = await this.scheduleShiftsService.findFirst(
+      requestExists.origin_shift_id,
+    )
+    const destinationScheduleShift = await this.scheduleShiftsService.findFirst(
+      requestExists.destination_id,
+    )
+
+    if (!originScheduleShift || !destinationScheduleShift)
+      throw new NotFoundException('Schedule shifts not found')
+
+    await Promise.all([
+      this.scheduleShiftsService.swapScheduleShift(
+        requestExists.origin_shift_id,
+        requestExists.destination_id,
+      ),
+      this.scheduleShiftsService.swapScheduleShift(
+        requestExists.destination_id,
+        requestExists.origin_shift_id,
+      ),
+    ])
+
     return this.shiftExchangeRequestRepo.update({
-      data: { status: 'APPROVED_RECEIVER' },
+      data: { status: 'APPROVED_MANAGER', end_date: new Date() },
       where: { id: shiftExchangeRequestId },
     })
   }
