@@ -6,8 +6,8 @@ export interface Schedule {
 	id: string;
 	user_id: string;
 	name: string;
-	start_date: Date;
-	end_date: Date;
+	start_date: string;
+	end_date: string;
 
 	user: User;
 	schedule_shifts: ScheduleShift[];
@@ -16,8 +16,9 @@ export interface Schedule {
 export interface ScheduleShift {
 	id: string;
 	schedule_id: string;
+	shift_id: string;
 	weekDay: WeekDay;
-	date: Date;
+	date: string;
 
 	schedule: Schedule;
 	shift: Shift;
