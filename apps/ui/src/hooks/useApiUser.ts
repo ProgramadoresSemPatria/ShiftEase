@@ -7,6 +7,7 @@ type UserResponse = {
 	email: string;
 	name: string;
 	role: Role;
+	department_id: string;
 };
 
 export const useApiUser = () => ({

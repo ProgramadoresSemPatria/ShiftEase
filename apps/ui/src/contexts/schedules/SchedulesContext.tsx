@@ -9,7 +9,7 @@ export type SchedulesContextType = {
 		shiftType,
 		from,
 		to,
-	}: QueryParams) => Promise<Schedule | null>;
+	}: QueryParams) => Promise<Schedule[] | null>;
 };
 
 const defaultSchedulesContext: SchedulesContextType = {

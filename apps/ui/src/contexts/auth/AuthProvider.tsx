@@ -1,8 +1,8 @@
 import { useApiPublic } from "@/hooks/useApiPublic";
 import { useApiUser } from "@/hooks/useApiUser";
 import { type JSX, useEffect, useMemo, useState } from "react";
-import { AuthContext } from "./AuthContext";
 import type { contextUser } from "./AuthContext";
+import { AuthContext } from "./AuthContext";
 
 export const AuthProvider = ({ children }: { children: JSX.Element }) => {
 	const [user, setUser] = useState<contextUser | null>(null);
