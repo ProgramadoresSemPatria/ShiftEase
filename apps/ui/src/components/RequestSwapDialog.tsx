@@ -12,7 +12,7 @@ import {
 import { AuthContext } from "@/contexts/auth/AuthContext";
 import { useShiftExchangeRequest } from "@/hooks/useShiftExchangeRequest";
 import { ScheduleShift } from "@/types/schedule";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import SelectExchangeShift from "./SelectExchangeShift";
 
 type Props = {
@@ -34,8 +34,10 @@ export default function RequestSwapDialog({
 }: Props) {
   const [selectedShiftId, setSelectedShiftId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const { createSwapRequest } = useShiftExchangeRequest();
   const { user } = useContext(AuthContext);
+  const dialogCloseRef = useRef<HTMLButtonElement>(null);
 
   const handleSendRequest = async () => {
     if (!selectedShiftId) {
@@ -52,12 +54,18 @@ export default function RequestSwapDialog({
       departmentId: user!.department_id,
       originShiftId: selectedShiftId,
       destinationId,
+      reason: "Solicitação de troca de turno",
     };
 
     try {
       await createSwapRequest(swapRequestData);
       setError(null);
-      console.log("Solicitação de troca enviada com sucesso!");
+      setSuccessMessage(`Request sent to ${name}!`);
+      setTimeout(() => {
+        if (dialogCloseRef.current) {
+          dialogCloseRef.current.click();
+        }
+      }, 2000);
     } catch (err) {
       setError("Erro ao enviar a solicitação de troca.");
       console.error(err);
@@ -90,15 +98,21 @@ export default function RequestSwapDialog({
               />
             </div>
             {error && <div className="text-red-500">{error}</div>}
+            {successMessage && (
+              <div className="text-green-600 bg-green-100 p-2 rounded-md flex items-center gap-2">
+                <span>✔</span> {successMessage}
+              </div>
+            )}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-end">
           <DialogClose>
-            <Button>Cancel</Button>
+            <Button ref={dialogCloseRef}>Cancel</Button>
           </DialogClose>
           <Button
             className="bg-orange-500 text-white font-bold shadow-md"
             onClick={handleSendRequest}
+            disabled={!!successMessage}
           >
             Send Request
           </Button>
