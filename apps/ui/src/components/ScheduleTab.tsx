@@ -1,121 +1,218 @@
-// import { useState } from "react";
-// import SelectTimePeriod from "./SelectTimePeriod";
-// import TimePeriodDropdown from "./TimePeriodDropdown";
-
+import { Button } from "@/components/ui/button";
 import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
+import { AuthContext } from "@/contexts/auth/AuthContext";
+import { useApiSchedules } from "@/hooks/useApiSchedules";
+import { useApiUser } from "@/hooks/useApiUser";
+import { ScheduleShift } from "@/types/schedule";
+import { useContext, useEffect, useState } from "react";
 import ShiftCard from "./ShiftCard";
 
-interface ShiftRecord {
-	[key: string]: string;
+// Interfaces
+export interface WorkerShift {
+  date: string;
+  dayOfWeek: string;
+  displayDate: string;
+  shiftType: string;
+  shiftTime: string;
 }
 
-interface Worker {
-	name: string;
-	shifts: ShiftRecord;
+interface WorkerSchedule {
+  userId: string;
+  name: string;
+  shifts: Record<string, WorkerShift | "Day Off">;
 }
 
 export default function ScheduleTab() {
-	const days = [
-		"Mon 24",
-		"Tue 25",
-		"Wed 26",
-		"Thu 27",
-		"Fri 28",
-		"Sat 29",
-		"Sun 30",
-	];
+  const [workers, setWorkers] = useState<WorkerSchedule[]>([]);
+  const [loggedUserShifts, setLoggedUserShifts] = useState<ScheduleShift[]>([]); // Novo estado
+  const [days, setDays] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState(new Date());
 
-	const workers: Worker[] = [
-		{
-			name: "Pablo",
-			shifts: {
-				"Mon 24": "09:00 - 17:00",
-				"Wed 26": "10:00 - 18:00",
-				"Fri 28": "08:00 - 16:00",
-			},
-		},
+  const { findAll } = useApiSchedules();
+  const { findUserSchedules } = useApiUser();
+  const { user } = useContext(AuthContext);
 
-		{
-			name: "Bob",
-			shifts: {
-				"Tue 25": "08:00 - 16:00",
-				"Thu 27": "12:00 - 20:00",
-				"Sat 29": "09:00 - 17:00",
-			},
-		},
-		{
-			name: "Charlie",
-			shifts: {
-				"Mon 24": "12:00 - 20:00",
-				"Thu 27": "09:00 - 17:00",
-				"Sun 30": "10:00 - 18:00",
-			},
-		},
-		{
-			name: "Diana",
-			shifts: {
-				"Tue 25": "10:00 - 18:00",
-				"Wed 26": "09:00 - 17:00",
-				"Sat 29": "12:00 - 20:00",
-			},
-		},
-		{
-			name: "Edward",
-			shifts: {
-				"Mon 24": "08:00 - 16:00",
-				"Fri 28": "12:00 - 20:00",
-				"Sun 30": "09:00 - 17:00",
-			},
-		},
-	];
-	return (
-		<div className="flex flex-col gap-5 px-5 py-5 rounded-md bg-white w-full">
-			{/* <div className="flex gap-3 items-end">
-				<SelectTimePeriod />
-			</div> */}
-			<div>
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead className="w-[100px] text-lg">Name</TableHead>
-							{days.map((day, index) => (
-								<TableHead
-									key={day}
-									className={`text-lg ${index % 2 !== 0 ? "bg-gray-100" : ""}`}
-								>
-									{day}
-								</TableHead>
-							))}
-						</TableRow>
-					</TableHeader>
+  const formatDisplayDate = (date: Date) => {
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    return `${dayNames[date.getUTCDay()]} ${date.getUTCDate()}`;
+  };
 
-					<TableBody>
-						{workers.map((worker) => (
-							<TableRow key={worker.name}>
-								<TableCell className="font-medium">{worker.name}</TableCell>
-								{days.map((day) => (
-									<TableCell key={`${worker.name}-${day}`} className="p-2">
-										{worker.shifts[day] && (
-											<ShiftCard
-												name={worker.name}
-												schedule={worker.shifts[day]}
-												isSwapable={days[0] !== day}
-											/>
-										)}
-									</TableCell>
-								))}
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</div>
-		</div>
-	);
+  const getShiftTime = (shiftType: string) => {
+    switch (shiftType) {
+      case "DIURNAL":
+        return "08:00 - 16:00";
+      case "NOCTURNAL":
+        return "20:00 - 04:00";
+      default:
+        return "09:00 - 17:00";
+    }
+  };
+
+  const generateWeekDates = (start: Date) => {
+    return Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      return formatDisplayDate(date);
+    });
+  };
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies:
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const from = startDate.toISOString().split("T")[0];
+        const to = new Date(startDate);
+        to.setDate(to.getDate() + 6);
+        const toDate = to.toISOString().split("T")[0];
+
+        const weekDates = generateWeekDates(startDate);
+        setDays(weekDates);
+
+        const response = await findAll({
+          departmentId: user!.department_id,
+          from,
+          to: toDate,
+        });
+
+        if (!response) {
+          setError("Não foi possível carregar as escalas.");
+          return;
+        }
+
+        const workersMap = new Map<string, WorkerSchedule>();
+
+        response.forEach((schedule) => {
+          const userId = schedule.user_id;
+          const workerName = schedule.name
+            .split(" - ")[0]
+            .replace("Escala ", "");
+
+          if (!workersMap.has(userId)) {
+            workersMap.set(userId, { userId, name: workerName, shifts: {} });
+          }
+
+          schedule.schedule_shifts.forEach((shift) => {
+            const displayDate = formatDisplayDate(new Date(shift.date));
+            const shiftType = shift.shift.type;
+            const shiftTime = getShiftTime(shiftType);
+
+            const worker = workersMap.get(userId);
+            if (worker) {
+              worker.shifts[displayDate] = {
+                date: shift.date,
+                dayOfWeek: shift.weekDay,
+                displayDate,
+                shiftType,
+                shiftTime,
+              };
+            }
+          });
+        });
+
+        const workersArray = Array.from(workersMap.values());
+
+        workersArray.forEach((worker) => {
+          weekDates.forEach((date) => {
+            if (!worker.shifts[date]) {
+              worker.shifts[date] = "Day Off";
+            }
+          });
+        });
+
+        setWorkers(workersArray);
+      } catch (err) {
+        setError("Erro ao carregar as escalas.");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSchedules();
+  }, [startDate, user]);
+
+  useEffect(() => {
+    const fetchUserSchedulesShifts = async () => {
+      const response = await findUserSchedules();
+
+      if (response) {
+        response?.schedules.forEach((schedule) => {
+          setLoggedUserShifts(schedule.schedule_shifts);
+        });
+      }
+    };
+
+    fetchUserSchedulesShifts();
+  }, [user]);
+
+  const handlePreviousWeek = () => {
+    setStartDate((prev) => new Date(prev.getTime() - 7 * 24 * 60 * 60 * 1000));
+  };
+
+  const handleNextWeek = () => {
+    setStartDate((prev) => new Date(prev.getTime() + 7 * 24 * 60 * 60 * 1000));
+  };
+
+  return (
+    <div className="flex flex-col gap-5 px-5 py-5 rounded-md bg-white w-full">
+      <div className="flex justify-between">
+        <Button onClick={handlePreviousWeek}>← Semana Anterior</Button>
+        <Button onClick={handleNextWeek}>Próxima Semana →</Button>
+      </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center p-10 bg-white rounded-md">
+          Carregando escalas...
+        </div>
+      ) : error ? (
+        <div className="text-center p-4 text-red-500">{error}</div>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[200px] text-lg">Nome</TableHead>
+              {days.map((day) => (
+                <TableHead key={day} className="text-lg">
+                  {day}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {workers.map((worker) => (
+              <TableRow key={worker.userId}>
+                <TableCell className="font-medium">{worker.name}</TableCell>
+                {days.map((day) => (
+                  <TableCell key={`${worker.userId}-${day}`} className="p-2">
+                    {worker.shifts[day] === "Day Off" ? (
+                      <span className="text-gray-400">Day Off</span>
+                    ) : (
+                      <ShiftCard
+                        name={worker.name}
+                        schedule={worker.shifts[day]?.shiftTime}
+                        isSwapable={days[0] !== day}
+                        day={day}
+                        loggedUserShifts={loggedUserShifts}
+                      />
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
+  );
 }
