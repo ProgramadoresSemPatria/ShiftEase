@@ -21,7 +21,7 @@ export interface WorkerShift {
   displayDate: string;
   shiftType: string;
   shiftTime: string;
-  id?: string;
+  id: string;
 }
 
 interface WorkerSchedule {
