@@ -21,6 +21,7 @@ export interface WorkerShift {
   displayDate: string;
   shiftType: string;
   shiftTime: string;
+  id?: string;
 }
 
 interface WorkerSchedule {
@@ -31,7 +32,7 @@ interface WorkerSchedule {
 
 export default function ScheduleTab() {
   const [workers, setWorkers] = useState<WorkerSchedule[]>([]);
-  const [loggedUserShifts, setLoggedUserShifts] = useState<ScheduleShift[]>([]); // Novo estado
+  const [loggedUserShifts, setLoggedUserShifts] = useState<ScheduleShift[]>([]);
   const [days, setDays] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +66,6 @@ export default function ScheduleTab() {
     });
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies:
   useEffect(() => {
     const fetchSchedules = async () => {
       setIsLoading(true);
@@ -111,6 +111,7 @@ export default function ScheduleTab() {
             const worker = workersMap.get(userId);
             if (worker) {
               worker.shifts[displayDate] = {
+                id: shift.id,
                 date: shift.date,
                 dayOfWeek: shift.weekDay,
                 displayDate,
@@ -193,21 +194,28 @@ export default function ScheduleTab() {
             {workers.map((worker) => (
               <TableRow key={worker.userId}>
                 <TableCell className="font-medium">{worker.name}</TableCell>
-                {days.map((day) => (
-                  <TableCell key={`${worker.userId}-${day}`} className="p-2">
-                    {worker.shifts[day] === "Day Off" ? (
-                      <span className="text-gray-400">Day Off</span>
-                    ) : (
-                      <ShiftCard
-                        name={worker.name}
-                        schedule={worker.shifts[day]?.shiftTime}
-                        isSwapable={days[0] !== day}
-                        day={day}
-                        loggedUserShifts={loggedUserShifts}
-                      />
-                    )}
-                  </TableCell>
-                ))}
+                {days.map((day) => {
+                  const shift = worker.shifts[day];
+                  const isDayOff =
+                    typeof shift === "string" && shift === "Day Off";
+                  return (
+                    <TableCell key={`${worker.userId}-${day}`} className="p-2">
+                      {isDayOff ? (
+                        <span className="text-gray-400">Day Off</span>
+                      ) : (
+                        <ShiftCard
+                          name={worker.name}
+                          schedule={(shift as WorkerShift)?.shiftTime}
+                          isSwapable={days[0] !== day}
+                          day={day}
+                          shiftId={(shift as WorkerShift)?.id}
+                          userId={worker.userId}
+                          loggedUserShifts={loggedUserShifts}
+                        />
+                      )}
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             ))}
           </TableBody>
